@@ -1,0 +1,26 @@
+name: nulvr CI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        run: |
+          git init .
+          git remote add origin "https://github.com/${{ github.repository }}.git"
+          git fetch --depth=1 origin "${{ github.event.pull_request.head.sha }}"
+          git checkout --detach FETCH_HEAD
+      - name: Run tests
+        run: node --test tests/ledger.test.mjs
