@@ -25,3 +25,4 @@ Changes vs candidate (each backed by a test that failed on the candidate)
 - Ported from r1: fsync after append, sha256 of GitHub response body, extended ledger types.
 
 Open: trusted verdict write path; protected anchor storage; N1–N8 suite; CI annotation reader; Render SHA; protected-contracts checker.
+Agent permission test — no production changes.
