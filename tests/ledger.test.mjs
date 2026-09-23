@@ -24,3 +24,16 @@ test('r2-P4: 20 concurrent appends all succeed with bounded retry',async()=>{con
 test('r2-P3: stale lock fails closed with LEDGER_BUSY',()=>{const p=tmp();run('append',p,claim());require_mkdir(p.file+'.lock');const r=spawnSync(process.execPath,[script,'append',p.file],{input:JSON.stringify(claim('z')),encoding:'utf8',env:{...process.env,NULVR_ANCHOR_PATH:p.anchor,NULVR_LOCK_WAIT_MS:'200'}});assert.match(r.stderr,/LEDGER_BUSY/);assert.equal(run('verify',p).status,0)});
 import {mkdirSync as require_mkdir} from 'node:fs';
 test('r2-P5: main_head never reports a verdict on network failure',()=>{const r=spawnSync(process.execPath,[headScript],{encoding:'utf8',env:{...process.env,GITHUB_API:'http://127.0.0.1:9'}});const o=JSON.parse(r.stdout);assert.equal(o.status,'UNVERIFIABLE');assert.equal(r.status,2)});
+test('main_head: missing REPO fails closed',()=>{
+  const env={...process.env};
+  delete env.REPO;
+  const r=spawnSync(process.execPath,[headScript],{
+    encoding:'utf8',
+    env
+  });
+  assert.equal(r.status,2);
+  const o=JSON.parse(r.stdout);
+  assert.equal(o.status,'UNVERIFIABLE');
+  assert.equal(o.reason,'REPO_REQUIRED');
+  assert.equal(o.source,null);
+});
