@@ -1,0 +1,36 @@
+name: nulvr read-only observation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nulvr-observation
+  cancel-in-progress: false
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout nulvr source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Observe this repository main SHA
+        env:
+          REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node checks/main_head.mjs | tee main-head-observation.json
+      - name: Upload observation (not a verdict)
+        uses: actions/upload-artifact@v4
+        with:
+          name: nulvr-main-head-observation
+          path: main-head-observation.json
+          retention-days: 3
