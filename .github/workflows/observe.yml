@@ -31,8 +31,10 @@ jobs:
           set -o pipefail
           node checks/main_head.mjs | tee main-head-observation.json
       - name: Upload observation (not a verdict)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: nulvr-main-head-observation
           path: main-head-observation.json
           retention-days: 3
+          if-no-files-found: warn
