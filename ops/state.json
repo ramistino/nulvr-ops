@@ -80,17 +80,19 @@
           "status": "EXACT_SOURCE_TECHNICAL_RERUN_PASS_GUARD_REVIEWED_OPERATIONAL_BLOCKED",
           "note": "Fresh source-bound PROVE-style technical rerun on Node v22.16.0: Git blob hashes match GitHub 3a902ff/da8e47f/1f81374; 18/18 passed, 0 failed/skipped, log SHA256 e26c1a041f383a81de5aaf85a98d9ebfa347cd2f254d191c268526e0b2ae4ef8. Static GUARD review: child binds 127.0.0.1, fetches only constructed loopback base, no writes, verdict flags false, SIGTERM/SIGKILL fallback. This is same assistant/session, NOT independent organizational PROVE/GUARD signoff. OS RSS/CPU quotas, protected owner pin, immutable staging, workload budgets and external review remain pending. No CI/merge/deploy/spend.",
           "local_tests": {
-            "tests": 50,
-            "passed": 50,
+            "tests": 18,
+            "passed": 18,
             "failed": 0,
+            "skipped": 0,
             "build_repetitions": 2,
-            "prove_repetitions": 1,
+            "technical_rerun_repetitions": 1,
             "runtime": "node-v22.16.0",
-            "harness_blob": "5ae20aad76243799ff76f6893f22aa792a6be713",
-            "test_blob": "45c97258eaabd90dff63365898aad4439e452707",
-            "prove_review_commit": "bc44f2494fd7e88256e524e043ac1252995a1a19",
-            "prove_log_sha256": "87ecbe7768f31a2f8765c1c787f37e78a65e69bb10ba737a9c13a6bc4a1bf95b",
-            "trust_level": "OFFLINE_SYNTHETIC_TECHNICAL_ONLY"
+            "harness_blob": "3a902ff1735b9fb602b305ec37f1148d6d05ac09",
+            "target_blob": "da8e47f1cfd776afa629a50ecfc05f83a44bf6cd",
+            "test_blob": "1f81374c7349195f7479e4b0ea2d1ae162a5a79a",
+            "technical_rerun_log_sha256": "e26c1a041f383a81de5aaf85a98d9ebfa347cd2f254d191c268526e0b2ae4ef8",
+            "trust_level": "OFFLINE_SYNTHETIC_TECHNICAL_ONLY",
+            "independent_reviewer_signoff": false
           },
           "pending_verification": {
             "github_blobs": {
@@ -113,10 +115,37 @@
               "OS resource quotas",
               "approved workload budgets",
               "separate operational T2 GO"
+            ],
+            "guard_findings": [
+              {
+                "id": "G1",
+                "finding": "V8 old-space 96 MiB is not an OS RSS/CPU limit",
+                "gate": "OS_QUOTAS_PENDING"
+              },
+              {
+                "id": "G2",
+                "finding": "Caller-provided fixture digest and pinnedCommit are provenance claims, not independently authenticated owner pins",
+                "gate": "PROTECTED_OWNER_PIN_PENDING"
+              },
+              {
+                "id": "G3",
+                "finding": "Private root and O_NOFOLLOW on final input do not provide immutable staging or full ancestor-directory race resistance",
+                "gate": "IMMUTABLE_STAGING_PENDING"
+              },
+              {
+                "id": "G4",
+                "finding": "Technical rerun and static GUARD inspection performed within same assistant/session",
+                "gate": "INDEPENDENT_REVIEW_PENDING"
+              },
+              {
+                "id": "G5",
+                "finding": "Synthetic fixture is not consumed as workload; real workload budgets and ALPS integration unapproved",
+                "gate": "OPERATIONAL_APPROVAL_PENDING"
+              }
             ]
           },
           "local_equivalent_recheck": {
-            "status": "PASS_LOCAL_EQUIVALENT_NOT_EXACT_SOURCE",
+            "status": "HISTORICAL_OLDER_REVISION_NOT_CURRENT_QUALIFICATION",
             "node": "v22.16.0",
             "passes": [
               14,
@@ -130,7 +159,7 @@
               "0d8b911f1afd716b4228aa200a9b90583b55995776d702dd0f3aafd0b1f49682",
               "dc7ab0207c9a8e6724ab9b414fa27585085c10df95aa7f8dbb160c057b792101"
             ],
-            "limitation": "Local working copies have different Git blob hashes than current published GitHub files; these results cannot qualify the published commit. Exact-source rerun and independent PROVE remain pending."
+            "limitation": "Historical older revision only. Current exact-source C4 qualification is tracked in local_tests and pending_verification."
           }
         },
         {
