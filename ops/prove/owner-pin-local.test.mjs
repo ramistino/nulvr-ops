@@ -10,7 +10,7 @@ const p={schemaVersion:'nulvr.owner-pin-design.v0.1a',verificationId:'12345678-1
 const actual={sourceRepository:p.source.repository,sourceCommit:p.source.commit,checkerSha256:p.checkerFiles.map(x=>x.rawSha256),manifestSha256:p.manifestSha256,evidenceRepository:p.evidence.repository,evidenceCommit:p.evidence.commit,evidenceTreeSha:p.evidence.treeSha};
 const now=new Date('2026-09-26T12:00:00Z');
 const signatureBase64=sign(null,Buffer.concat([domainPrefix,Buffer.from(canonical(p))]),privateKey).toString('base64');
-const args={payload:p,signatureBase64,publicKeyPem:pem,trustedKeyFingerprint:fingerprint,actual,now};
+const args={payload:p,rawPayloadJson:JSON.stringify(p),signatureBase64,publicKeyPem:pem,trustedKeyFingerprint:fingerprint,actual,now};
 test('valid synthetic signature remains OBSERVED, not VERIFIED',()=>{const x=verifyOwnerPin(args);assert.equal(x.status,'OBSERVED');assert.equal(x.ledgerWrite,false);assert.equal(x.oneShotReplayEnforced,false)});
 test('wrong independent fingerprint rejected',()=>assert.equal(verifyOwnerPin({...args,trustedKeyFingerprint:'0'.repeat(64)}).status,'UNVERIFIABLE'));
 test('no independent fingerprint rejected',()=>assert.equal(verifyOwnerPin({...args,trustedKeyFingerprint:undefined}).reason,'INDEPENDENT_KEY_PIN_REQUIRED'));
@@ -55,3 +55,9 @@ test('canonical number formatting covers supported RFC 8785 values',()=>{
 test('array undefined elements cannot be silently dropped',()=>{
  assert.throws(()=>canonical([undefined]),/NON_JSON_OR_CYCLE/);
 });
+
+test('missing raw JSON fails closed',()=>assert.equal(verifyOwnerPin({...args,rawPayloadJson:undefined}).reason,'RAW_JSON_REQUIRED'));
+test('duplicate signed JSON key fails closed before signature verification',()=>{const raw=args.rawPayloadJson.replace('"approvedScope":"SYNTHETIC_OFFLINE_ONLY"','"approvedScope":"PRODUCTION","approvedScope":"SYNTHETIC_OFFLINE_ONLY"');assert.equal(verifyOwnerPin({...args,rawPayloadJson:raw}).reason,'DUPLICATE_JSON_KEY')});
+test('escaped duplicate signed JSON key fails closed',()=>{const raw=args.rawPayloadJson.replace('"approvedScope":"SYNTHETIC_OFFLINE_ONLY"','"approvedScope":"PRODUCTION","\\u0061pprovedScope":"SYNTHETIC_OFFLINE_ONLY"');assert.equal(verifyOwnerPin({...args,rawPayloadJson:raw}).reason,'DUPLICATE_JSON_KEY')});
+test('raw signed payload mismatch fails closed',()=>{const raw=args.rawPayloadJson.replace('SYNTHETIC_OFFLINE_ONLY','PRODUCTION');assert.equal(verifyOwnerPin({...args,rawPayloadJson:raw}).reason,'RAW_PAYLOAD_MISMATCH')});
+test('malformed raw JSON fails closed',()=>assert.equal(verifyOwnerPin({...args,rawPayloadJson:'{"a":1,}'}).reason,'RAW_JSON_INVALID'));
