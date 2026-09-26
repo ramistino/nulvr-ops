@@ -1,6 +1,6 @@
 // C3 local-only durable replay prototype. Not a production authority or protected ledger.
 // Root directory must be provisioned independently on a trusted filesystem by the operator.
-import {open,stat,realpath} from 'node:fs/promises';
+import {open,lstat,realpath} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {join,resolve} from 'node:path';
 const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -11,8 +11,8 @@ export async function reserveReplayId({verificationId,registryRoot}={}){
  const root=resolve(registryRoot);
  let fd;
  try{
-  const meta=await stat(root);
-  if(!meta.isDirectory()||meta.isSymbolicLink()||(meta.mode&0o077)!==0)return deny('REGISTRY_PERMISSIONS_INVALID');
+  const meta=await lstat(root);
+  if(!meta.isDirectory()||meta.isSymbolicLink()||(meta.mode&0o077)!==0||(typeof process.getuid==='function'&&meta.uid!==process.getuid()))return deny('REGISTRY_PERMISSIONS_INVALID');
   if(await realpath(root)!==root)return deny('REGISTRY_ROOT_NOT_CANONICAL');
   const name=createHash('sha256').update(verificationId).digest('hex')+'.reserved';
   // O_EXCL prevents two cooperating local processes from claiming the same ID.
