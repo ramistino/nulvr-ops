@@ -80,8 +80,8 @@ test('caller object cannot substitute snapshot identity after signed raw JSON eq
  assert.equal(reads,1);
 });
 
-test('unsafe integers are rejected instead of signing rounded JSON numbers',()=>{
- assert.throws(()=>canonical(Number.MAX_SAFE_INTEGER+1),/INVALID_NUMBER/);
- assert.throws(()=>canonical(-(Number.MAX_SAFE_INTEGER+1)),/INVALID_NUMBER/);
- assert.equal(canonical(Number.MAX_SAFE_INTEGER),String(Number.MAX_SAFE_INTEGER));
+test('RFC 8785 preserves IEEE-754 representation of large finite numbers',()=>{
+ assert.equal(canonical(1e30),'1e+30');
+ assert.equal(canonical(Number.MAX_SAFE_INTEGER+1),'9007199254740992');
+ assert.throws(()=>canonical(Infinity),/INVALID_NUMBER/);
 });

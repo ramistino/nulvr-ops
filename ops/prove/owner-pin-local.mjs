@@ -11,13 +11,13 @@ const keys=(v,expected)=>v!==null&&typeof v==='object'&&!Array.isArray(v)&&Objec
 const validDate=s=>typeof s==='string'&&/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z$/.test(s)&&Number.isFinite(Date.parse(s))&&new Date(s).toISOString().replace(/\.000Z$/,'Z')===s.replace(/\.0+Z$/,'Z');
 function invalid(reason){throw new Error(reason)}
 // RFC8785 JSON canonicalization for this schema's JSON-compatible primitives.
-// Reject non-JSON values, unsafe integers, unpaired UTF-16 surrogates and cyclic objects.
+// Reject non-JSON values, non-finite numbers, unpaired UTF-16 surrogates and cyclic objects.
 function validString(s){if (/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/u.test(s))invalid('INVALID_UNICODE')}
 export function canonical(value,seen=new Set()){
  if(value===null)return 'null';
  if(typeof value==='string'){validString(value);return JSON.stringify(value)}
  if(typeof value==='boolean')return value?'true':'false';
- if(typeof value==='number'){if(!Number.isFinite(value)||(Number.isInteger(value)&&!Number.isSafeInteger(value)))invalid('INVALID_NUMBER');return JSON.stringify(value)}
+ if(typeof value==='number'){if(!Number.isFinite(value))invalid('INVALID_NUMBER');return JSON.stringify(value)}
  if(typeof value!=='object'||seen.has(value))invalid('NON_JSON_OR_CYCLE');
  seen.add(value);let result;
  if(Array.isArray(value)){if(Object.keys(value).filter(k=>/^(0|[1-9][0-9]*)$/.test(k)).length!==value.length)invalid('SPARSE_ARRAY');result='['+Array.from(value,v=>canonical(v,seen)).join(',')+']';}
