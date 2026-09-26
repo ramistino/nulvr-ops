@@ -1,0 +1,22 @@
+{
+  "work_id": "C2",
+  "track": "COMPANY",
+  "tier": "T1",
+  "owner_lane": "BUILD",
+  "repository": "ramistino/nulvr-ops",
+  "base_commit": "30d9e7dec90ca78892abf81a43b843d9c1f7c048",
+  "acceptance_criteria": [
+    "Company and ALPS product tracks are represented independently",
+    "ALPS Phase 4.18 NOT PASS does not mark the company track blocked",
+    "No runtime permission is granted by the state or handoff files"
+  ],
+  "visible_inputs": [
+    "Founder-approved NULVR Constitution v1.0",
+    "nulvr-ops main tree",
+    "ALPS current release-gate status"
+  ],
+  "evidence": [],
+  "status": "PROPOSED",
+  "next_gate": "Independent PROVE review of schema semantics before adoption",
+  "authority_required": "PROVE"
+}

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nulvr.example/schemas/handoff-v1.json",
+  "title": "NULVR Work Handoff v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "work_id",
+    "track",
+    "tier",
+    "owner_lane",
+    "repository",
+    "base_commit",
+    "acceptance_criteria",
+    "visible_inputs",
+    "evidence",
+    "status",
+    "next_gate"
+  ],
+  "properties": {
+    "work_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "track": {
+      "enum": [
+        "COMPANY",
+        "ALPS_PRODUCT",
+        "OTHER_PRODUCT"
+      ]
+    },
+    "tier": {
+      "enum": [
+        "T1",
+        "T2",
+        "T3",
+        "T1_DIAGNOSTIC",
+        "T3_ACTIVATION_GATE"
+      ]
+    },
+    "owner_lane": {
+      "enum": [
+        "FOUNDER",
+        "BUILD",
+        "PROVE",
+        "GUARD"
+      ]
+    },
+    "repository": {
+      "type": "string",
+      "minLength": 1
+    },
+    "base_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "visible_inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "ref"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "digest": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "PROPOSED",
+        "ACTIVE",
+        "BLOCKED",
+        "OBSERVED",
+        "UNVERIFIABLE",
+        "VERIFIED",
+        "REFUTED",
+        "RELEASED"
+      ]
+    },
+    "next_gate": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority_required": {
+      "enum": [
+        "NONE",
+        "PROVE",
+        "GUARD",
+        "FOUNDER",
+        "PROVE_AND_GUARD",
+        "FOUNDER_AND_PROVE_GUARD"
+      ]
+    }
+  }
+}

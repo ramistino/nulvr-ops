@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0",
+  "generated_for": "NULVR company operating scaffold",
+  "policy_version": "Engineering & Operating Constitution v1.0",
+  "company_mode": "BOUNDED_MANUAL_AI_ASSISTED",
+  "orchestrator": {
+    "status": "NOT_ACTIVATED",
+    "authority": []
+  },
+  "tracks": {
+    "company": {
+      "status": "ACTIVE",
+      "blocking_dependency_on_alps_4_18": false,
+      "work": [
+        {
+          "id": "C1",
+          "title": "Diagnose nulvr-ops PR #7 zero-job CI startup failure",
+          "tier": "T1_DIAGNOSTIC",
+          "lane": "GUARD",
+          "status": "ACTIVE",
+          "cost_policy": "READ_ONLY_NO_RERUN"
+        },
+        {
+          "id": "C2",
+          "title": "Machine-readable operating handoff/state contract",
+          "tier": "T1",
+          "lane": "BUILD",
+          "status": "ACTIVE",
+          "cost_policy": "NO_EXTERNAL_RUNTIME"
+        },
+        {
+          "id": "C3",
+          "title": "Trusted PROVE checker on synthetic fixtures",
+          "tier": "T2",
+          "lane": "PROVE",
+          "status": "READY_FOR_DESIGN"
+        },
+        {
+          "id": "C4",
+          "title": "Reusable isolated load-test harness",
+          "tier": "T2",
+          "lane": "BUILD",
+          "status": "READY_FOR_DESIGN"
+        },
+        {
+          "id": "C5",
+          "title": "Minimal governance CI",
+          "tier": "T2",
+          "lane": "GUARD",
+          "status": "BLOCKED_FROM_ACTIVATION",
+          "depends_on": [
+            "C3"
+          ]
+        },
+        {
+          "id": "C6",
+          "title": "Qualify PROVE on ALPS evidence",
+          "tier": "T2",
+          "lane": "PROVE",
+          "status": "FUTURE_GATE",
+          "depends_on": [
+            "C3"
+          ]
+        },
+        {
+          "id": "C7",
+          "title": "Bounded read-only Orchestrator pilot",
+          "tier": "T3_ACTIVATION_GATE",
+          "lane": "FOUNDER",
+          "status": "NOT_ACTIVATED",
+          "depends_on": [
+            "C6",
+            "14_DAY_QUALIFICATION"
+          ]
+        }
+      ]
+    },
+    "alps_product": {
+      "status": "ACTIVE_BLOCKED_RELEASE",
+      "phase_4_18": "NOT_PASS",
+      "blocks_company_build": false,
+      "blocks": [
+        "ALPS_RELEASE_AUTHORITY",
+        "FINAL_ALPS_BASED_PROVE_QUALIFICATION"
+      ]
+    }
+  },
+  "prohibited": [
+    "AUTONOMOUS_MERGE",
+    "AUTONOMOUS_DEPLOY",
+    "AUTONOMOUS_SPEND",
+    "SELF_VERIFICATION",
+    "SECOND_ALPS_EVIDENCE_AUTHORITY"
+  ],
+  "note": "This state file is descriptive and grants no runtime permission."
+}
