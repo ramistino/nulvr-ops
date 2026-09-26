@@ -1,4 +1,4 @@
-# C4 — Isolated load-test facility: T2 Product Blueprint + architecture (design only)
+# C4 — Isolated load-test facility: T2 Product Blueprint + architecture (design + offline synthetic PoC, not activated)
 
 **Purpose:** Build a reusable, offline/provisioned-on-demand load-testing tool for NULVR products that measures the precise conditions causing service liveness failures. The facility is a **company asset**, independent of ALPS Phase 4.18; ALPS becomes its first future target **only after separate approval**.
 
@@ -39,4 +39,4 @@ Never hardcode a passing latency, RSS or event-loop threshold without a workload
 4. No outbound network, no cloud resource creation, no production writes; local run terminates at approved CPU/memory/time bounds.
 5. PROVE re-runs independent tests and reviews failure handling. Owner approves T2 Architecture Lock **before operational activation**.
 
-**Present status:** design staged. No load generator, production probe, extra CI run or new billed service was created by this document.
+**Present status:** a localhost-only synthetic PoC is staged at `ops/load-tests/local-harness.mjs` with target `local-target.mjs` and 5 tests in `ops/tests/local-harness.test.mjs`. It detects independent liveness failures even when a blocked request later returns HTTP 200; an asynchronous control retains liveness. Three local test repetitions each yielded 17/17 when combined with C3's 12 tests. This is not the approved operational facility: no independent PROVE acceptance, measured Engineering Budget, or T2 Architecture Lock yet. No production probe, GitHub CI run or billed resource was created.

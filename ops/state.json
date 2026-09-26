@@ -51,8 +51,20 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "DESIGN_STAGED_AWAIT_T2_LOCK",
-          "note": "Offline-only design staged; no harness, production target or resource provisioned."
+          "status": "LOCAL_SYNTHETIC_POC_STAGED_AWAIT_INDEPENDENT_PROVE",
+          "note": "Offline local-only process/watchdog PoC and five tests staged. Three local repetitions: 5/5 C4 + 12/12 C3. Independent PROVE, T2 Architecture Lock, budget derivation and production integration NOT approved.",
+          "local_tests": {
+            "tests": 5,
+            "passed": 5,
+            "repetitions": 3,
+            "runtime": "node-v22.16.0",
+            "source_blobs": [
+              "36abf7f5aca442da6149a1b2bee94430fea08b72",
+              "9d93e485e449ffccfbc262d5abf65aca55d08c24",
+              "20e4c28b1c8c3932f2af70140ef1636b44d3baaf"
+            ],
+            "trust_level": "OFFLINE_SYNTHETIC_ONLY"
+          }
         },
         {
           "id": "C5",
