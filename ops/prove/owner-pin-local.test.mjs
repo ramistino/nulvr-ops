@@ -61,3 +61,21 @@ test('duplicate signed JSON key fails closed before signature verification',()=>
 test('escaped duplicate signed JSON key fails closed',()=>{const raw=args.rawPayloadJson.replace('"approvedScope":"SYNTHETIC_OFFLINE_ONLY"','"approvedScope":"PRODUCTION","\\u0061pprovedScope":"SYNTHETIC_OFFLINE_ONLY"');assert.equal(verifyOwnerPin({...args,rawPayloadJson:raw}).reason,'DUPLICATE_JSON_KEY')});
 test('raw signed payload mismatch fails closed',()=>{const raw=args.rawPayloadJson.replace('SYNTHETIC_OFFLINE_ONLY','PRODUCTION');assert.equal(verifyOwnerPin({...args,rawPayloadJson:raw}).reason,'RAW_PAYLOAD_MISMATCH')});
 test('malformed raw JSON fails closed',()=>assert.equal(verifyOwnerPin({...args,rawPayloadJson:'{"a":1,}'}).reason,'RAW_JSON_INVALID'));
+
+test('signed parsed JSON is authoritative even if caller object getter mutates after equivalence check',()=>{
+ let reads=0;
+ const mutable={...p};
+ Object.defineProperty(mutable,'signerKeySha256',{enumerable:true,get(){return ++reads===1?fingerprint:'0'.repeat(64)}});
+ const result=verifyOwnerPin({...args,payload:mutable});
+ assert.equal(result.status,'OBSERVED');
+ assert.equal(reads,1);
+ assert.equal(result.ledgerWrite,false);
+});
+test('caller object cannot substitute snapshot identity after signed raw JSON equivalence',()=>{
+ let reads=0;
+ const source={...p.source};
+ Object.defineProperty(source,'commit',{enumerable:true,get(){return ++reads===1?p.source.commit:'0'.repeat(40)}});
+ const result=verifyOwnerPin({...args,payload:{...p,source}});
+ assert.equal(result.status,'OBSERVED');
+ assert.equal(reads,1);
+});
