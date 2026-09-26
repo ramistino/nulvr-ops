@@ -43,10 +43,10 @@ Every meaningful work item should carry:
 - acceptance criteria fixed before verification
 - inputs visible to the lane
 - outputs/evidence references
-- status: `PROPOSED | ACTIVE | BLOCKED | OBSERVED | VERIFIED | REFUTED | RELEASED`
-- next gate and authority required
+- status (untrusted handoff v1.1): `PROPOSED | ACTIVE | BLOCKED | OBSERVED | UNVERIFIABLE | CHECK_ERROR`
+- next gate and explicit `authority_required` (descriptive; grants no permission)
 
-A narrative model answer is never a `VERIFIED` verdict.
+Use [`handoff-v1.1.schema.json`](./handoff-v1.1.schema.json) for new handoffs; the original v1 schema is historical and *format-only*. Source-bound [PROVE schema review](https://github.com/ramistino/nulvr-ops/blob/0fd2759717015c5d298295fe5abb50f46fb5475b/ops/prove/reviews/2026-09-26-c2-v11.md) validated 17/17 structural cases. `VERIFIED`, `REFUTED`, and `RELEASED` require separately protected verdict/release records, not author-supplied status. A narrative model answer is never a protected `VERIFIED` verdict.
 
 ## Immediate company backlog
 

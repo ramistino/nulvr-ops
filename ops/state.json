@@ -26,8 +26,9 @@
           "title": "Machine-readable operating handoff/state contract",
           "tier": "T1",
           "lane": "BUILD",
-          "status": "STAGED_AWAIT_PROVE",
-          "cost_policy": "NO_EXTERNAL_RUNTIME"
+          "status": "V11_SCHEMA_SOURCE_REVIEW_PASS_STAGED",
+          "cost_policy": "NO_EXTERNAL_RUNTIME",
+          "note": "C2 handoff v1.1 keeps work records non-authoritative; exact Git blob 623f6c72..., fresh Python Draft 2020-12 validation 17/17; separate PROVE review commit 0fd2759...; branch-only, no protected VERIFIED authority."
         },
         {
           "id": "C3",
