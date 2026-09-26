@@ -34,15 +34,25 @@
           "title": "Trusted PROVE checker on synthetic fixtures",
           "tier": "T2",
           "lane": "PROVE",
-          "status": "SYNTHETIC_PROTOTYPE_STAGED",
-          "note": "Offline-only OBSERVED/UNVERIFIABLE/CHECK_ERROR, no trusted VERIFIED writes; requires PROVE review and T2 lock."
+          "status": "LOCAL_TESTS_PASS_AWAIT_INDEPENDENT_PROVE",
+          "note": "Independent PROVE, filesystem hardening and founder T2 Architecture Lock required before trusted operations.",
+          "local_tests": {
+            "count": 12,
+            "passed": 12,
+            "failed": 0,
+            "runtime": "node-v22.16.0",
+            "checker_blob": "ca35376cde818b12588af64ebe614a9c3cc01a1b",
+            "test_blob": "2cb5fd5fe6aa8f68e667b5c63ee2f0fc0d4eabfb",
+            "trust_level": "SYNTHETIC_ONLY_NO_VERIFIED_WRITE"
+          }
         },
         {
           "id": "C4",
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "READY_FOR_DESIGN"
+          "status": "DESIGN_STAGED_AWAIT_T2_LOCK",
+          "note": "Offline-only design staged; no harness, production target or resource provisioned."
         },
         {
           "id": "C5",
