@@ -34,8 +34,8 @@
           "title": "Trusted PROVE checker on synthetic fixtures",
           "tier": "T2",
           "lane": "PROVE",
-          "status": "LOCAL_TESTS_PASS_AWAIT_INDEPENDENT_PROVE",
-          "note": "Independent PROVE, filesystem hardening and founder T2 Architecture Lock required before trusted operations.",
+          "status": "ARCHITECTURE_LOCK_V0_2_CANDIDATE",
+          "note": "PROVE found assertion-semantics and closed-bundle gaps in v0.1. v0.2 lock candidate separates integrity core from fixed assertion adapters and defines undeclared files as errors. Founder approval remains pending.",
           "local_tests": {
             "count": 12,
             "passed": 12,
