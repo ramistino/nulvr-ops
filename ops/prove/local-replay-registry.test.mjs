@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,chmod,rm,readdir,readFile,symlink} from 'node:fs/promises';
+import {mkdtemp,chmod,rm,readdir,readFile,symlink,mkdir} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {execFile} from 'node:child_process';
@@ -36,4 +36,21 @@ test('separate processes cannot both reserve the same ID',()=>withRoot(async roo
  const statuses=outcomes.map(x=>x.stdout.trim());
  assert.equal(statuses.filter(x=>x==='RESERVED_LOCAL_ONLY:').length,1);
  assert.equal(statuses.filter(x=>x==='UNVERIFIABLE:REPLAY_DETECTED').length,7);
+}));
+
+test('rejects writable non-sticky ancestor',()=>withRoot(async base=>{
+ const parent=join(base,'unsafe');
+ const root=join(parent,'registry');
+ await mkdir(parent,{mode:0o700});
+ await mkdir(root,{mode:0o700});
+ await chmod(parent,0o777);
+ try{assert.equal((await reserveReplayId({verificationId:id,registryRoot:root})).reason,'REGISTRY_ANCESTOR_UNSAFE')}
+ finally{await chmod(parent,0o700)}
+}));
+test('rejects symlinked ancestor even when root itself is a real directory',()=>withRoot(async base=>{
+ const actual=join(base,'actual');const link=join(base,'alias');
+ await mkdir(actual,{mode:0o700});await mkdir(join(actual,'registry'),{mode:0o700});
+ await symlink(actual,link);
+ try{assert.equal((await reserveReplayId({verificationId:id,registryRoot:join(link,'registry')})).reason,'REGISTRY_ROOT_NOT_CANONICAL')}
+ finally{await rm(link,{force:true})}
 }));
