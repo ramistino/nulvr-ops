@@ -8,7 +8,9 @@ export function authenticateTrustSource(input){
  return deny('AUTHENTICATED_TRUST_SOURCE_NOT_IMPLEMENTED');
 }
 export function requireAuthenticatedTrustSource(receipt){
- if(!receipt||receipt.trustSourceAuthenticated!==true)return deny('AUTHENTICATED_TRUST_SOURCE_REQUIRED');
+ let claimed;
+ try{claimed=receipt?.trustSourceAuthenticated}catch{return deny('TRUST_SOURCE_INPUT_ERROR')}
+ if(claimed!==true)return deny('AUTHENTICATED_TRUST_SOURCE_REQUIRED');
  // Deliberately reject caller-crafted booleans. A future implementation must replace this
  // module with cryptographically/operationally authenticated provenance before activation.
  return deny('AUTHENTICATED_TRUST_SOURCE_NOT_IMPLEMENTED');
