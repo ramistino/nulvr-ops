@@ -34,8 +34,8 @@
           "title": "Trusted PROVE checker on synthetic fixtures",
           "tier": "T2",
           "lane": "PROVE",
-          "status": "V0_2A_OFFLINE_IMPLEMENTED_LOCAL_PASS_AWAIT_PROVE",
-          "note": "Founder-approved offline synthetic v0.2a Layer A+Layer B staged. Locally re-ran 42/42 including C4; exact implementation/test blobs pinned in implementation note. No independently trusted VERIFIED writer or production access.",
+          "status": "SYNTHETIC_PASS_TRUST_BOUNDARY_DESIGN_REVIEW",
+          "note": "Synthetic v0.2a has source-bound 42/42 technical recheck. Protected owner-pin + immutable evidence identity design candidate staged; no trusted VERIFIED writer or activation.",
           "local_tests": {
             "count": 42,
             "passed": 42,
