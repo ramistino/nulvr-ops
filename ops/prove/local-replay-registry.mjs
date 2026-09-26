@@ -2,7 +2,7 @@
 // Root directory must be provisioned independently on a trusted filesystem by the operator.
 import {open,lstat,realpath} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
-import {join,resolve} from 'node:path';
+import {join,resolve,dirname} from 'node:path';
 const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const deny=reason=>({status:'UNVERIFIABLE',reason,ledgerWrite:false,releaseAuthority:false});
 export async function reserveReplayId({verificationId,registryRoot}={}){
@@ -14,6 +14,21 @@ export async function reserveReplayId({verificationId,registryRoot}={}){
   const meta=await lstat(root);
   if(!meta.isDirectory()||meta.isSymbolicLink()||(meta.mode&0o077)!==0||(typeof process.getuid==='function'&&meta.uid!==process.getuid()))return deny('REGISTRY_PERMISSIONS_INVALID');
   if(await realpath(root)!==root)return deny('REGISTRY_ROOT_NOT_CANONICAL');
+  // A canonical root can still sit beneath a replaceable, attacker-controlled ancestor.
+  // This check detects existing unsafe ancestors; it is not a TOCTOU-safe directory-fd walk.
+  let ancestor=dirname(root);
+  while(true){
+   const parent=await lstat(ancestor);
+   if(!parent.isDirectory()||parent.isSymbolicLink())return deny('REGISTRY_ANCESTOR_INVALID');
+   const uid=typeof process.getuid==='function'?process.getuid():null;
+   const ownedByOperator=uid!==null&&parent.uid===uid;
+   const ownedByRoot=parent.uid===0;
+   const writableByOthers=(parent.mode&0o022)!==0;
+   const stickyRoot=(parent.mode&0o1000)!==0&&ownedByRoot;
+   if((!ownedByOperator&&!ownedByRoot)||(writableByOthers&&!stickyRoot))return deny('REGISTRY_ANCESTOR_UNSAFE');
+   if(ancestor==='/')break;
+   ancestor=dirname(ancestor);
+  }
   const name=createHash('sha256').update(verificationId).digest('hex')+'.reserved';
   // O_EXCL prevents two cooperating local processes from claiming the same ID.
   fd=await open(join(root,name),'wx',0o600);
