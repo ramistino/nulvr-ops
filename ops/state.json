@@ -53,8 +53,8 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "LOCAL_SYNTHETIC_POC_STAGED_AWAIT_INDEPENDENT_PROVE",
-          "note": "Offline local-only process/watchdog PoC and five tests staged. Three local repetitions: 5/5 C4 + 12/12 C3. Independent PROVE, T2 Architecture Lock, budget derivation and production integration NOT approved.",
+          "status": "T2_HARDENING_LOCK_CANDIDATE_PENDING_FOUNDER_GO",
+          "note": "C4 exact-source PROVE/GUARD review found unbounded config/fixture reads, undifferentiated network-error/timeout classification, fixture hash not actually driving load and non-OS memory cap. T2 local-only hardening lock staged; no activation.",
           "local_tests": {
             "tests": 5,
             "passed": 5,
