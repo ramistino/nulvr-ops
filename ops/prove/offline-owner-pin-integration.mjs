@@ -27,7 +27,9 @@ export function verifySyntheticOwnerPinFixture({rawPayloadJson,payload,signature
 // Operational entry point: fail closed until independent protected provenance exists.
 export function verifyOfflineOwnerPin(args={}){
  if(!args||typeof args!=='object'||Array.isArray(args))return deny('INVALID_INTEGRATION_INPUT');
- const trust=requireAuthenticatedTrustSource(args.trustSourceReceipt);
- if(trust.status!=='OBSERVED')return deny(trust.reason);
- return verifySyntheticOwnerPinFixture(args);
+ try{
+  const trust=requireAuthenticatedTrustSource(args.trustSourceReceipt);
+  if(trust.status!=='OBSERVED')return deny(trust.reason);
+  return verifySyntheticOwnerPinFixture(args);
+ }catch{return deny('INTEGRATION_INPUT_ERROR')}
 }
