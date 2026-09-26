@@ -34,8 +34,8 @@
           "title": "Trusted PROVE checker on synthetic fixtures",
           "tier": "T2",
           "lane": "PROVE",
-          "status": "ARCHITECTURE_LOCK_V0_2_CANDIDATE",
-          "note": "PROVE found assertion-semantics and closed-bundle gaps in v0.1. v0.2 lock candidate separates integrity core from fixed assertion adapters and defines undeclared files as errors. Founder approval remains pending.",
+          "status": "V0_2A_DESIGN_AWAIT_FOUNDER_GO",
+          "note": "Bounded no-regex synthetic v0.2a proposal staged, plus separate branch-only closed-bundle v0.1.1 hardening candidate (local 22/22); awaiting independent review and founder T2 GO. No trusted VERIFIED writer.",
           "local_tests": {
             "count": 12,
             "passed": 12,
