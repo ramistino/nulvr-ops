@@ -1,7 +1,7 @@
 // C3 synthetic-only PROVE candidate. This NEVER emits VERIFIED or writes to the protected ledger.
 // The manifest digest and expected Git SHA MUST arrive from an independent, pre-approved channel.
 import {createHash, timingSafeEqual} from 'node:crypto';
-import {openSync, readFileSync, closeSync, fstatSync, lstatSync, realpathSync, constants} from 'node:fs';
+import {openSync, readFileSync, closeSync, fstatSync, lstatSync, realpathSync, readdirSync, constants} from 'node:fs';
 import {join, relative, isAbsolute, sep} from 'node:path';
 
 const MAX_MANIFEST = 65536;
@@ -66,6 +66,35 @@ function validate(manifest) {
     if (total > MAX_EVIDENCE) fail('MANIFEST_TOTAL_SIZE_LIMIT');
   }
 }
+// Closed evidence bundle: manifest describes every regular file in the root.
+// If the manifest itself lives under root, exclude only that exact canonical file.
+function verifyClosedBundle(realRoot, manifestPath, declaredPaths) {
+  const manifestReal = realpathSync(manifestPath);
+  const seen = new Set();
+  let directories = 0;
+  function walk(directory, prefix, depth) {
+    if (depth > 8 || ++directories > 64) fail('BUNDLE_DIRECTORY_LIMIT');
+    let items;
+    try { items = readdirSync(directory, {withFileTypes: true}); }
+    catch { fail('BUNDLE_ENUMERATION_FAILED'); }
+    for (const item of items) {
+      const rel = prefix ? `${prefix}/${item.name}` : item.name;
+      const full = join(directory, item.name);
+      const metadata = lstatSync(full);
+      if (metadata.isSymbolicLink()) fail(declaredPaths.has(rel) ? 'SYMLINK_NOT_ALLOWED' : 'BUNDLE_UNSAFE_NODE');
+      if (!metadata.isFile() && !metadata.isDirectory()) fail('BUNDLE_UNSAFE_NODE');
+      if (metadata.isDirectory()) { walk(full, rel, depth + 1); continue; }
+      if (full === manifestReal) continue;
+      if (!declaredPaths.has(rel)) fail('UNDECLARED_EVIDENCE');
+      if (seen.has(rel)) fail('DUPLICATE_EVIDENCE');
+      seen.add(rel);
+      if (seen.size > MAX_ENTRIES) fail('BUNDLE_FILE_LIMIT');
+    }
+  }
+  walk(realRoot, '', 0);
+  if (seen.size !== declaredPaths.size) fail('EVIDENCE_MISSING', 'UNVERIFIABLE');
+  return seen.size;
+}
 function check(manifestPath, root, pinnedManifestSha, expectedCommit) {
   if (!SHA256.test(pinnedManifestSha || '') || !COMMIT.test(expectedCommit || '')) fail('INDEPENDENT_PIN_REQUIRED', 'UNVERIFIABLE');
   // The manifest and its expected digest must not come from the same untrusted source.
@@ -78,8 +107,15 @@ function check(manifestPath, root, pinnedManifestSha, expectedCommit) {
   if (manifest.pinnedCommit !== expectedCommit) fail('COMMIT_PIN_MISMATCH');
 
   let realRoot;
-  try { realRoot = realpathSync(root); }
-  catch { fail('ROOT_UNAVAILABLE', 'UNVERIFIABLE'); }
+  try {
+    if (lstatSync(root).isSymbolicLink()) fail('BUNDLE_UNSAFE_ROOT');
+    realRoot = realpathSync(root);
+  } catch (error) {
+    if (error?.status) throw error;
+    fail('ROOT_UNAVAILABLE', 'UNVERIFIABLE');
+  }
+  // Avoid accepting a correct declared subset accompanied by undeclared data.
+  verifyClosedBundle(realRoot, manifestPath, new Set(manifest.entries.map(item => item.path)));
   let checked = 0;
   for (const item of manifest.entries) {
     const candidate = join(realRoot, ...item.path.split('/'));

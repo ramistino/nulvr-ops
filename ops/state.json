@@ -34,8 +34,8 @@
           "title": "Trusted PROVE checker on synthetic fixtures",
           "tier": "T2",
           "lane": "PROVE",
-          "status": "V0_2A_DESIGN_AWAIT_FOUNDER_GO",
-          "note": "Bounded no-regex synthetic v0.2a proposal staged, plus separate branch-only closed-bundle v0.1.1 hardening candidate (local 22/22); awaiting independent review and founder T2 GO. No trusted VERIFIED writer.",
+          "status": "V0_2A_ARCHITECTURE_LOCK_GO_IMPLEMENTATION_ACTIVE",
+          "note": "Founder GO recorded for bounded offline synthetic v0.2a only. No regex, trusted VERIFIED writer, CI, production, merge, deploy, spending or Orchestrator authority.",
           "local_tests": {
             "count": 12,
             "passed": 12,
