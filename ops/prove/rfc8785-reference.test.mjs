@@ -8,7 +8,7 @@ test('RFC 8785 published number and literal vector',()=>{
 });
 test('RFC 8785 published UTF-16 property ordering vector',()=>{
  const data={'€':'Euro Sign','\r':'Carriage Return','דּ':'Hebrew Letter Dalet With Dagesh','1':'One','😀':'Emoji: Grinning Face','\u0080':'Control','ö':'Latin Small Letter O With Diaeresis'};
- assert.deepEqual(Object.keys(JSON.parse(canonical(data))),['\r','1','\u0080','ö','€','😀','דּ']);
+ const encoded=canonical(data); const ordered=['\\r','1','\\u0080','ö','€','😀','דּ']; const actual=Object.keys(data).map(k=>({key:k,position:encoded.indexOf(JSON.stringify(k)+':')})).sort((a,b)=>a.position-b.position).map(x=>x.key); assert.deepEqual(actual,ordered);
 });
 test('RFC 8785 rejects lone surrogates',()=>assert.throws(()=>canonical({bad:'\uDEAD'}),/INVALID_UNICODE/));
 test('RFC 8785 rejects non-finite numbers',()=>assert.throws(()=>canonical({bad:Infinity}),/INVALID_NUMBER/));
