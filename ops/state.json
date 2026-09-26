@@ -18,14 +18,15 @@
           "tier": "T1_DIAGNOSTIC",
           "lane": "GUARD",
           "status": "ACTIVE",
-          "cost_policy": "READ_ONLY_NO_RERUN"
+          "cost_policy": "READ_ONLY_NO_RERUN",
+          "note": "PR #7 CI startup_failure with zero jobs and zero check runs; exact billing/scheduling cause unverified; do not rerun."
         },
         {
           "id": "C2",
           "title": "Machine-readable operating handoff/state contract",
           "tier": "T1",
           "lane": "BUILD",
-          "status": "ACTIVE",
+          "status": "STAGED_AWAIT_PROVE",
           "cost_policy": "NO_EXTERNAL_RUNTIME"
         },
         {
@@ -33,7 +34,8 @@
           "title": "Trusted PROVE checker on synthetic fixtures",
           "tier": "T2",
           "lane": "PROVE",
-          "status": "READY_FOR_DESIGN"
+          "status": "SYNTHETIC_PROTOTYPE_STAGED",
+          "note": "Offline-only OBSERVED/UNVERIFIABLE/CHECK_ERROR, no trusted VERIFIED writes; requires PROVE review and T2 lock."
         },
         {
           "id": "C4",
