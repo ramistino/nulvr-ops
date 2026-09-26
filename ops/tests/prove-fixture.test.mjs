@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {mkdtempSync, writeFileSync, rmSync, unlinkSync, symlinkSync} from 'node:fs';
+import {mkdtempSync, writeFileSync, rmSync, unlinkSync, symlinkSync, mkdirSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
@@ -123,4 +123,40 @@ test('duplicate evidence path is rejected in manifest', () => withFixture(f => {
   const {result, output} = f.run({pin});
   assert.equal(result.status, 1);
   assert.equal(output.reason, 'MANIFEST_ENTRY_INVALID');
+}));
+
+test('undeclared extra regular evidence is rejected by closed-bundle verifier', () => withFixture(f => {
+  writeFileSync(join(f.root, 'extra.json'), '{}');
+  const {result, output} = f.run();
+  assert.equal(result.status, 1);
+  assert.equal(output.reason, 'UNDECLARED_EVIDENCE');
+}));
+test('undeclared hidden file is rejected, not silently ignored', () => withFixture(f => {
+  writeFileSync(join(f.root, '.hidden'), 'untrusted');
+  const {result, output} = f.run();
+  assert.equal(result.status, 1);
+  assert.equal(output.reason, 'UNDECLARED_EVIDENCE');
+}));
+test('undeclared symlink in evidence root is rejected', () => withFixture(f => {
+  symlinkSync('evidence.json', join(f.root, 'extra-link'));
+  const {result, output} = f.run();
+  assert.equal(result.status, 1);
+  assert.equal(output.reason, 'BUNDLE_UNSAFE_NODE');
+}));
+
+test('undeclared nested evidence is rejected by recursive enumeration', () => withFixture(f => {
+  mkdirSync(join(f.root, 'nested'));
+  writeFileSync(join(f.root, 'nested', 'unexpected.json'), '{}');
+  const {result, output} = f.run();
+  assert.equal(result.status, 1);
+  assert.equal(output.reason, 'UNDECLARED_EVIDENCE');
+}));
+test('symlink evidence root is rejected even if its contents are valid', () => withFixture(f => {
+  const alias = f.root + '-symlink';
+  try {
+    symlinkSync(f.root, alias, 'dir');
+    const {result, output} = f.run({rootPath: alias});
+    assert.equal(result.status, 1);
+    assert.equal(output.reason, 'BUNDLE_UNSAFE_ROOT');
+  } finally {rmSync(alias, {force: true});}
 }));
