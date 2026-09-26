@@ -1,5 +1,6 @@
 // C3 T2 local-only owner-pin signature verifier. No signer/key generation, network or ledger writes.
 import {createHash, createPublicKey, verify as verifySignature} from 'node:crypto';
+import {parseStrictJson} from './raw-json-preflight.mjs';
 const SHA=/^[a-f0-9]{64}$/; const GIT=/^[a-f0-9]{40}$/;
 const REPO=/^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}\/[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/;
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -38,10 +39,13 @@ export function validatePayload(p,{now=new Date(),maxValidityMs=24*3600*1000}={}
 }
 // `trustedKeyFingerprint` MUST be supplied independently of the payload and worktree.
 // `actual` digests and Git identities MUST come from an independently acquired immutable snapshot.
-export function verifyOwnerPin({payload,signatureBase64,publicKeyPem,trustedKeyFingerprint,actual,now,maxValidityMs}){
+export function verifyOwnerPin({payload,rawPayloadJson,signatureBase64,publicKeyPem,trustedKeyFingerprint,actual,now,maxValidityMs}){
  const denied=(reason)=>({status:'UNVERIFIABLE',reason,ledgerWrite:false,releaseAuthority:false});
  try{
-  validatePayload(payload,{now,maxValidityMs});
+  if(typeof rawPayloadJson!=='string')return denied('RAW_JSON_REQUIRED');
+  const parsed=parseStrictJson(rawPayloadJson);
+  if(canonical(parsed)!==canonical(payload))return denied('RAW_PAYLOAD_MISMATCH');
+  validatePayload(parsed,{now,maxValidityMs});
   if(!SHA.test(trustedKeyFingerprint||''))return denied('INDEPENDENT_KEY_PIN_REQUIRED');
   const key=createPublicKey(publicKeyPem);
   if(key.asymmetricKeyType!=='ed25519')return denied('ED25519_KEY_REQUIRED');
@@ -49,7 +53,7 @@ export function verifyOwnerPin({payload,signatureBase64,publicKeyPem,trustedKeyF
   if(hash(der)!==trustedKeyFingerprint||payload.signerKeySha256!==trustedKeyFingerprint)return denied('KEY_PIN_MISMATCH');
   if(typeof signatureBase64!=='string'||!/^[-A-Za-z0-9+/]{86}==$/.test(signatureBase64))return denied('SIGNATURE_FORMAT_INVALID');
   const sig=Buffer.from(signatureBase64,'base64');if(sig.length!==64||sig.toString('base64')!==signatureBase64)return denied('SIGNATURE_FORMAT_INVALID');
-  const message=Buffer.concat([PREFIX,Buffer.from(canonical(payload),'utf8')]);
+  const message=Buffer.concat([PREFIX,Buffer.from(canonical(parsed),'utf8')]);
   if(!verifySignature(null,message,key,sig))return denied('SIGNATURE_INVALID');
   if(!keys(actual,['sourceRepository','sourceCommit','checkerSha256','manifestSha256','evidenceRepository','evidenceCommit','evidenceTreeSha'])||
     actual.sourceRepository!==payload.source.repository||actual.sourceCommit!==payload.source.commit||
