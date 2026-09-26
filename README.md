@@ -25,3 +25,9 @@ Changes vs candidate (each backed by a test that failed on the candidate)
 - Ported from r1: fsync after append, sha256 of GitHub response body, extended ledger types.
 
 Open: trusted verdict write path; protected anchor storage; N1–N8 suite; CI annotation reader; Render SHA; protected-contracts checker.
+
+## NULVR Engineering & Operating Constitution v1.0
+
+The founder-approved 26 September 2026 constitution is available as repository-readable Markdown: [Engineering Constitution](docs/constitution/v1.0/engineering.md) and [Institutional Operating Model](docs/constitution/v1.0/operating-model.md). See the [constitution index and source checksums](docs/constitution/v1.0/README.md).
+
+**Governance status:** policy frozen; automated CI governance and independent orchestration are **not enabled** by this documentation change. Required activation order: ALPS 4.18 → load-test environment → trusted PROVE checker → minimal governance CI → bounded read-only Orchestrator. No agent receives merge, deployment or spending authority.
