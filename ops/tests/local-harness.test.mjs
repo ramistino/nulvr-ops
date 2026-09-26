@@ -57,3 +57,74 @@ test('no unpinned build SHA', async () => {
   try {await assert.rejects(() => runLocal(f.configPath), /CONFIG_INVALID/);}
   finally {rmSync(f.dir, {recursive:true, force:true});}
 });
+
+// T2 local hardening negative cases: no remote target and no extra infrastructure.
+import {unlinkSync, renameSync, symlinkSync, chmodSync, readFileSync} from 'node:fs';
+import {classifyProbeError, summarizeLiveness} from '../load-tests/local-harness.mjs';
+test('oversized config fails before full materialization or child spawn', async () => {
+  const f = await fixture('responsive');
+  try {
+    writeFileSync(f.configPath, 'x'.repeat(4097));
+    await assert.rejects(() => runLocal(f.configPath), /INPUT_TOO_LARGE/);
+  } finally {rmSync(f.dir, {recursive:true,force:true});}
+});
+test('oversized fixture fails before full materialization or child spawn', async () => {
+  const f = await fixture('responsive');
+  try {
+    writeFileSync(join(f.dir,'fixture.json'), 'x'.repeat(65537));
+    await assert.rejects(() => runLocal(f.configPath), /INPUT_TOO_LARGE/);
+  } finally {rmSync(f.dir, {recursive:true,force:true});}
+});
+test('symlink fixture is refused even when target is local', async () => {
+  const f = await fixture('responsive');
+  try {
+    renameSync(join(f.dir,'fixture.json'),join(f.dir,'real.json'));
+    symlinkSync('real.json',join(f.dir,'fixture.json'));
+    await assert.rejects(() => runLocal(f.configPath), /INPUT_NOT_REGULAR_FILE/);
+  } finally {rmSync(f.dir, {recursive:true,force:true});}
+});
+test('symlink config is refused', async () => {
+  const f = await fixture('responsive');
+  try {
+    renameSync(f.configPath,join(f.dir,'real-config.json'));
+    symlinkSync('real-config.json',f.configPath);
+    await assert.rejects(() => runLocal(f.configPath), /INPUT_NOT_REGULAR_FILE/);
+  } finally {rmSync(f.dir, {recursive:true,force:true});}
+});
+test('fixture outside the private config root is refused', async () => {
+  const f = await fixture('responsive');
+  try {
+    const config = JSON.parse(readFileSync(f.configPath,'utf8'));
+    config.fixturePath = '/tmp/different-location.json';
+    writeFileSync(f.configPath,JSON.stringify(config));
+    await assert.rejects(() => runLocal(f.configPath), /FIXTURE_OUTSIDE_APPROVED_ROOT/);
+  } finally {rmSync(f.dir, {recursive:true,force:true});}
+});
+test('shared or world-readable staging root is refused', async () => {
+  const f = await fixture('responsive');
+  try {
+    chmodSync(f.dir, 0o755);
+    await assert.rejects(() => runLocal(f.configPath), /LOCAL_ROOT_NOT_PRIVATE/);
+  } finally {rmSync(f.dir, {recursive:true,force:true});}
+});
+test('watchdog classifies timeout separately from failed connection',()=> {
+  assert.equal(classifyProbeError({name:'TimeoutError'}),'TIMEOUT');
+  assert.equal(classifyProbeError({name:'AbortError'}),'TIMEOUT');
+  assert.equal(classifyProbeError(Object.assign(new Error('connection reset'),{code:'ECONNRESET'})),'TRANSPORT_ERROR');
+});
+test('HTTP 503, timeout and transport errors each fail liveness and do not pollute successful latency percentiles',()=> {
+  const liveness = summarizeLiveness([
+    {kind:'HTTP_200',status:200,latencyMs:10},
+    {kind:'HTTP_NON_200',status:503,latencyMs:9},
+    {kind:'TIMEOUT',status:'TIMEOUT',latencyMs:110},
+    {kind:'TRANSPORT_ERROR',status:'TRANSPORT_ERROR',latencyMs:4}
+  ]);
+  assert.equal(liveness.total,4);
+  assert.equal(liveness.successes,1);
+  assert.equal(liveness.httpNon200,1);
+  assert.equal(liveness.timeouts,1);
+  assert.equal(liveness.transportErrors,1);
+  assert.equal(liveness.failures,3);
+  assert.equal(liveness.p95SuccessMs,10);
+  assert.equal(liveness.livenessFailed,true);
+});

@@ -53,19 +53,17 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "T2_HARDENING_LOCK_CANDIDATE_PENDING_FOUNDER_GO",
-          "note": "C4 exact-source PROVE/GUARD review found unbounded config/fixture reads, undifferentiated network-error/timeout classification, fixture hash not actually driving load and non-OS memory cap. T2 local-only hardening lock staged; no activation.",
+          "status": "LOCAL_HARDENING_50_OF_50_X2_PENDING_INDEPENDENT_PROVE",
+          "note": "Scoped zero-spend local-only hardening staged after founder continuation; two local 50/50 runs. No trusted operational activation, production workload, CI or paid resource. Independent exact-source PROVE rerun and GUARD review pending.",
           "local_tests": {
-            "tests": 5,
-            "passed": 5,
-            "repetitions": 3,
+            "tests": 50,
+            "passed": 50,
+            "failed": 0,
+            "repetitions": 2,
             "runtime": "node-v22.16.0",
-            "source_blobs": [
-              "36abf7f5aca442da6149a1b2bee94430fea08b72",
-              "9d93e485e449ffccfbc262d5abf65aca55d08c24",
-              "20e4c28b1c8c3932f2af70140ef1636b44d3baaf"
-            ],
-            "trust_level": "OFFLINE_SYNTHETIC_ONLY"
+            "harness_blob": "5ae20aad76243799ff76f6893f22aa792a6be713",
+            "test_blob": "45c97258eaabd90dff63365898aad4439e452707",
+            "trust_level": "SYNTHETIC_BUILD_ONLY_PENDING_PROVE"
           }
         },
         {
