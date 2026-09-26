@@ -157,7 +157,11 @@ test('work timeout is bounded and cannot produce operational PASS', async () => 
  try {const r=await runLocal(f.configPath);
  assert.equal(r.work.status,null);assert.equal(r.work.errorKind,'TIMEOUT');
  assert.ok(r.technicalOutcome.reasons.includes('WORK_TIMEOUT'));
- assert.equal(r.technicalOutcome.operationalPass,false);}
+ assert.equal(r.technicalOutcome.operationalPass,false);
+ assert.equal(r.resources.measurementSource,'PERIODIC_SAMPLE_NOT_FINAL');
+ assert.ok(r.resources.childRssBytesSampled > 0);
+ assert.ok(r.resources.childCpuMicrosSampled >= 0);
+ assert.equal(r.resources.childRssBytesAfterWork,null);}
  finally {rmSync(f.dir,{recursive:true,force:true});}
 });
 test('healthy work and liveness still cannot bypass unapproved provenance/resources',()=>{
