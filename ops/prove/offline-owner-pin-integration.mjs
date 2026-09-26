@@ -7,8 +7,10 @@ import {requireAuthenticatedTrustSource} from './trust-source-contract.mjs';
 const digest=b=>createHash('sha256').update(b).digest('hex');
 const deny=reason=>({status:'UNVERIFIABLE',reason,ledgerWrite:false,releaseAuthority:false});
 // Synthetic fixture only: all provenance labels are caller supplied. Never grants protected authority.
-export function verifySyntheticOwnerPinFixture({rawPayloadJson,payload,signatureBase64,publicKeyPem,anchor,snapshot,actual,seenIds,now}){
+export function verifySyntheticOwnerPinFixture(input={}){
  try{
+  if(!input||typeof input!=='object'||Array.isArray(input))return deny('INVALID_SYNTHETIC_INPUT');
+  const {rawPayloadJson,payload,signatureBase64,publicKeyPem,anchor,snapshot,actual,seenIds,now}=input;
   if(!anchor||anchor.origin!=='INDEPENDENT_OFFLINE_READONLY')return deny('PROTECTED_ANCHOR_REQUIRED');
   if(!snapshot||snapshot.verifiedSource!=='INDEPENDENT_OFFLINE_READONLY')return deny('INDEPENDENT_SNAPSHOT_REQUIRED');
   // Bind checked identities to the exact anchored snapshot bytes, not caller-supplied claims.
