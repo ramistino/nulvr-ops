@@ -101,6 +101,23 @@
               "ops/tests/local-harness.test.mjs"
             ],
             "status": "UNVERIFIED_NEW_REVISION"
+          },
+          "local_equivalent_recheck": {
+            "status": "PASS_LOCAL_EQUIVALENT_NOT_EXACT_SOURCE",
+            "node": "v22.16.0",
+            "passes": [
+              14,
+              14
+            ],
+            "failures": [
+              0,
+              0
+            ],
+            "run_log_sha256": [
+              "0d8b911f1afd716b4228aa200a9b90583b55995776d702dd0f3aafd0b1f49682",
+              "dc7ab0207c9a8e6724ab9b414fa27585085c10df95aa7f8dbb160c057b792101"
+            ],
+            "limitation": "Local working copies have different Git blob hashes than current published GitHub files; these results cannot qualify the published commit. Exact-source rerun and independent PROVE remain pending."
           }
         },
         {
