@@ -17,3 +17,19 @@ test('contract can never grant ledger or release authority',()=>{
   assert.equal(r.ledgerWrite,false); assert.equal(r.releaseAuthority,false);
  }
 });
+
+test('throwing receipt getter fails closed at trust-source boundary',()=>{
+ const r=requireAuthenticatedTrustSource({get trustSourceAuthenticated(){throw Error('hostile')}});
+ assert.equal(r.status,'UNVERIFIABLE');
+ assert.equal(r.reason,'TRUST_SOURCE_INPUT_ERROR');
+ assert.equal(r.trustSourceAuthenticated,false);
+ assert.equal(r.ledgerWrite,false);
+ assert.equal(r.releaseAuthority,false);
+});
+test('hostile Proxy cannot escape trust-source boundary',()=>{
+ const r=requireAuthenticatedTrustSource(new Proxy({}, {get(){throw Error('hostile proxy')}}));
+ assert.equal(r.status,'UNVERIFIABLE');
+ assert.equal(r.reason,'TRUST_SOURCE_INPUT_ERROR');
+ assert.equal(r.ledgerWrite,false);
+ assert.equal(r.releaseAuthority,false);
+});
