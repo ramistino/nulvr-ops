@@ -36,7 +36,7 @@
           "tier": "T2",
           "lane": "PROVE",
           "status": "LOCAL_OWNER_PIN_IMPLEMENTED_SYNTHETIC_TESTS_PASS_TRUSTED_ACTIVATION_BLOCKED",
-          "note": "Founder-approved T2 local-only implementation is staged: Ed25519 Owner Pin, strict JSON preflight, synthetic-only integration, fail-closed operational trust-source contract, and single-filesystem local replay prototype. Historical v0.2a combined 42/42 and unsigned schema 19/19 remain separate evidence. Latest reported local C3 suite 93/93; trust-contract plus integration exact-source subset 27/27 at review. Protected founder key, immutable independent acquisition, transactional replay ledger and protected VERIFIED writer are NOT implemented. No CI, merge, deploy, or spend.",
+          "note": "Founder-approved T2 local-only implementation is staged: Ed25519 Owner Pin, strict JSON preflight, synthetic-only integration, fail-closed operational trust-source contract, and single-filesystem local replay prototype. Historical v0.2a combined 42/42 and unsigned schema 19/19 remain separate evidence. Latest reported local C3 suite 113/113; trust-contract plus integration exact-source subset 27/27 at review. Protected founder key, immutable independent acquisition, transactional replay ledger and protected VERIFIED writer are NOT implemented. No CI, merge, deploy, or spend.",
           "local_tests": {
             "count": 42,
             "passed": 42,
@@ -52,14 +52,16 @@
             "scope": "FOUNDER_T2_LOCAL_ONLY",
             "synthetic_fixture": "IMPLEMENTED_OBSERVED_NO_AUTHORITY",
             "operational_verifier": "FAIL_CLOSED_UNVERIFIABLE",
-            "replay_registry": "LOCAL_SINGLE_FILESYSTEM_PROTOTYPE_NOT_PROTECTED",
+            "replay_registry": "LOCAL_SINGLE_FILESYSTEM_PROTOTYPE_HOSTILE_INPUT_GUARDED_NOT_PROTECTED",
             "trust_source": "NO_AUTHENTICATED_POSITIVE_BRANCH",
             "protected_ledger_writer": "NOT_IMPLEMENTED",
             "reported_local_suite": {
-              "passed": 93,
+              "passed": 113,
               "failed": 0,
+              "skipped": 0,
               "runtime": "node-v22.16.0",
-              "qualification": "LOCAL_REVIEW_NOT_PRODUCTION"
+              "qualification": "LOCAL_COMBINED_SUITE_NOT_PRODUCTION",
+              "note": "Local combined suite re-run after hostile replay-input fix; exact Git blob matches verified for modified replay implementation and tests, not re-fetched for every module in suite."
             },
             "exact_source_subset": {
               "passed": 27,
