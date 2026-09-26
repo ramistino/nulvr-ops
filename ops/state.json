@@ -77,7 +77,7 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "TIMEOUT_TELEMETRY_SOURCE_BOUND_RERUN_PASS_OPERATIONAL_BLOCKED",
+          "status": "LOCAL_OS_QUOTA_FEASIBILITY_DONE_DEDICATED_CGROUP_REQUIRED_OPERATIONAL_BLOCKED",
           "note": "Branch-only C4 timeout telemetry patch adds 100ms periodic IPC resource samples, preserves last sample on synthetic work timeout, explicitly distinguishes sampled values from final workComplete metrics. Exact local patch blobs match GitHub: harness 450ebeb5, target 75cd8361, tests 15b1897a; Node v22.16.0 two complete local runs 18/18 each, zero failures/skips. This is same-session BUILD evidence, not independent PROVE/GUARD signoff. Periodic samples are not OS RSS/CPU limits, may be absent if event loop stalls or child dies; no production authority. No CI/merge/deploy/spend.",
           "local_tests": {
             "tests": 18,
@@ -118,7 +118,7 @@
               "independent reviewer signoff",
               "protected owner pin",
               "immutable staging",
-              "OS resource quotas",
+              "dedicated writable cgroup v2 or reviewed equivalent for per-child OS resource quotas",
               "approved workload budgets",
               "separate operational T2 GO"
             ],
@@ -185,6 +185,29 @@
             "scope": "one fresh manual run each responsive/workTimeout/blocked",
             "timeout_sample": "RSS 33083392 bytes; CPU 156914 microseconds; sampled, not final",
             "limits": "No OS resource quota or independent reviewer signoff"
+          },
+          "os_quota_feasibility": {
+            "status": "LOCAL_EXPERIMENT_COMPLETE_NOT_OPERATIONAL",
+            "report": "ops/load-tests/os-quota-feasibility-2026-09-26.md",
+            "report_commit": "867837be8d38c17d6716bdca63d511ec47578793",
+            "local_probe_blob": "cde7bb083181d187ced8132bd7f334ac2bb53d05",
+            "local_probe_test_blob": "38883d9dc6d4a0f534bc48caef94fa824f01d8a3",
+            "combined_offline_tests": [
+              {
+                "passed": 20,
+                "failed": 0,
+                "skipped": 0,
+                "log_sha256": "f0f99a3590c204b97c9a9291ee50554c3b9bb1bdca4b0cbc147a697e8c464a80"
+              },
+              {
+                "passed": 20,
+                "failed": 0,
+                "skipped": 0,
+                "log_sha256": "52488507538ddb29c610f0a3741b1b6b6205e25507ee9851c00b577a5339b4ca"
+              }
+            ],
+            "finding": "cgroup v2 available but current environment cgroup.procs not writable; RLIMIT_AS 96MiB killed idle Node with SIGSEGV; neither qualifies per-child RSS/CPU quotas",
+            "source_status": "LOCAL_ARTIFACT_NOT_COMMITTED"
           }
         },
         {
