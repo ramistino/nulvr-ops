@@ -46,3 +46,20 @@ test('synthetic result cannot authenticate operational verifier',()=>{
  const operational=verifyOfflineOwnerPin({...args,trustSourceReceipt:synthetic});
  assert.equal(operational.status,'UNVERIFIABLE');
 });
+
+test('operational verifier fails closed on null, arrays and primitives',()=>{
+ for(const input of [null,[],42,'synthetic',false]){
+  const r=verifyOfflineOwnerPin(input);
+  assert.equal(r.status,'UNVERIFIABLE');
+  assert.equal(r.reason,'INVALID_INTEGRATION_INPUT');
+  assert.equal(r.ledgerWrite,false);
+  assert.equal(r.releaseAuthority,false);
+ }
+});
+test('operational verifier rejects caller-crafted provenance even with valid synthetic signature',()=>{
+ const receipt={status:'OBSERVED',trustSourceAuthenticated:true,origin:'INDEPENDENT_OFFLINE_READONLY',signatureValid:true};
+ const r=verifyOfflineOwnerPin({...args,trustSourceReceipt:receipt});
+ assert.equal(r.reason,'AUTHENTICATED_TRUST_SOURCE_NOT_IMPLEMENTED');
+ assert.equal(r.ledgerWrite,false);
+ assert.equal(r.releaseAuthority,false);
+});
