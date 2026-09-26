@@ -1,0 +1,25 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createHash,generateKeyPairSync,sign} from 'node:crypto';
+import {canonical,domainPrefix} from './owner-pin-local.mjs';
+import {verifyOfflineOwnerPin} from './offline-owner-pin-integration.mjs';
+const h=b=>createHash('sha256').update(b).digest('hex');
+const {publicKey,privateKey}=generateKeyPairSync('ed25519'); // ephemeral synthetic key, not founder key
+const publicKeyPem=publicKey.export({type:'spki',format:'pem'});
+const keySha256=h(publicKey.export({type:'spki',format:'der'}));
+const payload={schemaVersion:'nulvr.owner-pin-design.v0.1a',verificationId:'12345678-1234-4234-8234-123456789abc',approvedScope:'SYNTHETIC_OFFLINE_ONLY',source:{repository:'example/synthetic',commit:'a'.repeat(40)},checkerFiles:[{path:'ops/checks/prove-fixture.mjs',rawSha256:'b'.repeat(64)},{path:'ops/checks/assertions-v02a.mjs',rawSha256:'c'.repeat(64)}],manifestPath:'manifest.json',manifestSha256:'d'.repeat(64),evidence:{provider:'GITHUB_GIT_TREE',repository:'example/evidence',commit:'e'.repeat(40),treeSha:'f'.repeat(40)},assertionPolicy:'C3_SYNTHETIC_V0_2A',approvedAt:'2026-09-26T00:00:00Z',expiresAt:'2026-09-27T00:00:00Z',signerKeySha256:keySha256};
+const rawPayloadJson=JSON.stringify(payload);
+const signatureBase64=sign(null,Buffer.concat([domainPrefix,Buffer.from(canonical(payload))]),privateKey).toString('base64');
+const raw='synthetic snapshot';
+const anchor={origin:'INDEPENDENT_OFFLINE_READONLY',keySha256,snapshotSha256:h(raw)};
+const snapshot={raw,verifiedSource:'INDEPENDENT_OFFLINE_READONLY'};
+const actual={sourceRepository:payload.source.repository,sourceCommit:payload.source.commit,checkerSha256:payload.checkerFiles.map(f=>f.rawSha256),manifestSha256:payload.manifestSha256,evidenceRepository:payload.evidence.repository,evidenceCommit:payload.evidence.commit,evidenceTreeSha:payload.evidence.treeSha};
+const args={rawPayloadJson,payload,signatureBase64,publicKeyPem,anchor,snapshot,actual,seenIds:[],now:new Date('2026-09-26T12:00:00Z')};
+test('integrated signed synthetic fixture is OBSERVED only',()=>{const r=verifyOfflineOwnerPin(args);assert.equal(r.status,'OBSERVED');assert.equal(r.ledgerWrite,false);assert.equal(r.atomicReplayEnforced,false)});
+test('forged signature is rejected by integrated verifier',()=>assert.equal(verifyOfflineOwnerPin({...args,signatureBase64:'A'+signatureBase64.slice(1)}).status,'UNVERIFIABLE'));
+test('wrong independently supplied key pin is rejected',()=>assert.equal(verifyOfflineOwnerPin({...args,anchor:{...anchor,keySha256:'0'.repeat(64)}}).status,'UNVERIFIABLE'));
+test('tampered snapshot is rejected',()=>assert.equal(verifyOfflineOwnerPin({...args,snapshot:{...snapshot,raw:'tampered'}}).reason,'SNAPSHOT_ANCHOR_MISMATCH'));
+test('duplicate raw key is rejected before signature',()=>assert.equal(verifyOfflineOwnerPin({...args,rawPayloadJson:rawPayloadJson.replace('"approvedScope":"SYNTHETIC_OFFLINE_ONLY"','"approvedScope":"PRODUCTION","approvedScope":"SYNTHETIC_OFFLINE_ONLY"')}).reason,'DUPLICATE_JSON_KEY'));
+test('replayed verificationId is rejected',()=>assert.equal(verifyOfflineOwnerPin({...args,seenIds:[payload.verificationId]}).reason,'REPLAY_DETECTED'));
+test('untrusted anchor label is rejected',()=>assert.equal(verifyOfflineOwnerPin({...args,anchor:{...anchor,origin:'WORKTREE'}}).reason,'PROTECTED_ANCHOR_REQUIRED'));
+test('no caller supplied verification status is accepted',()=>{const r=verifyOfflineOwnerPin({...args,signatureBase64:'invalid',verification:{status:'OBSERVED',signatureValid:true,snapshotMatches:true}});assert.equal(r.status,'UNVERIFIABLE')});
