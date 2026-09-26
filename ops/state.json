@@ -35,8 +35,8 @@
           "title": "Trusted PROVE checker on synthetic fixtures",
           "tier": "T2",
           "lane": "PROVE",
-          "status": "LOCAL_OWNER_PIN_IMPLEMENTED_SYNTHETIC_TESTS_PASS_TRUSTED_ACTIVATION_BLOCKED",
-          "note": "Founder-approved T2 local-only implementation is staged: Ed25519 Owner Pin, strict JSON preflight, synthetic-only integration, fail-closed operational trust-source contract, and single-filesystem local replay prototype. Historical v0.2a combined 42/42 and unsigned schema 19/19 remain separate evidence. Latest reported local C3 suite 113/113; trust-contract plus integration exact-source subset 27/27 at review. Protected founder key, immutable independent acquisition, transactional replay ledger and protected VERIFIED writer are NOT implemented. No CI, merge, deploy, or spend.",
+          "status": "LOCAL_OWNER_PIN_QUALIFIED_SYNTHETIC_ONLY_TRUSTED_ACTIVATION_BLOCKED",
+          "note": "Founder-approved T2 local-only C3 implementation staged. Current published HEAD ed69ef6: RFC 8785 numeric compatibility restored; latest local suite reported 114/114 on Node v22.16.0 with current GitHub blobs matched in review. This is local synthetic technical qualification only, not independently authenticated trusted activation. Protected founder key, immutable independent acquisition, protected transactional replay ledger and VERIFIED writer remain unimplemented. No CI, merge, deploy, or spend.",
           "local_tests": {
             "count": 42,
             "passed": 42,
@@ -56,12 +56,13 @@
             "trust_source": "NO_AUTHENTICATED_POSITIVE_BRANCH",
             "protected_ledger_writer": "NOT_IMPLEMENTED",
             "reported_local_suite": {
-              "passed": 113,
+              "passed": 114,
               "failed": 0,
               "skipped": 0,
               "runtime": "node-v22.16.0",
-              "qualification": "LOCAL_COMBINED_SUITE_NOT_PRODUCTION",
-              "note": "Local combined suite re-run after hostile replay-input fix; exact Git blob matches verified for modified replay implementation and tests, not re-fetched for every module in suite."
+              "qualification": "LOCAL_SYNTHETIC_SUITE_SOURCE_BLOBS_MATCHED_NOT_PRODUCTION",
+              "head": "ed69ef6bf7d2ab918f113ed897c967755b53f4ca",
+              "note": "Local C3 suite reported 114/114 after RFC 8785 fix; current source/test blob identity reviewed. This is not a protected trust-source attestation."
             },
             "exact_source_subset": {
               "passed": 27,
