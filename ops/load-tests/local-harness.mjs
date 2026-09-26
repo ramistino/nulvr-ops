@@ -115,6 +115,7 @@ export async function runLocal(configPath) {
   let errText = '';
   child.stderr?.on('data', data => {errText += String(data).slice(0, 200);});
   let readyResolve, readyReject, metricsResolve;
+  let latestResourceSample = null;
   const readyPromise = new Promise((resolve, reject) => {readyResolve = resolve; readyReject = reject;});
   const metricsPromise = new Promise(resolve => {metricsResolve = resolve;});
   child.on('error', readyReject);
@@ -123,6 +124,7 @@ export async function runLocal(configPath) {
     if (msg.type === 'ready') readyResolve(msg);
     if (msg.type === 'fatal') readyReject(new Error(msg.reason));
     if (msg.type === 'workComplete') metricsResolve(msg);
+    if (msg.type === 'resourceSample') latestResourceSample = {...msg, receivedAtMs: performance.now()};
   });
   const overall = performance.now();
   child.send({scenario: config.scenario, workMs: config.workMs});
@@ -167,9 +169,10 @@ export async function runLocal(configPath) {
     })();
     const result = await deadline(work, config.maxDurationMs - 200, 'WORK_TIMEOUT');
     await deadline(watchdog, 1000, 'WATCHDOG_TIMEOUT');
-    const metrics = result.errorKind === 'TIMEOUT' ?
-      {eventLoopMaxDelayMs:null,rssBytes:null,peakRssKb:null,cpuMicros:null} :
+    const metrics = result.errorKind === 'TIMEOUT' ? latestResourceSample :
       await deadline(metricsPromise, 600, 'CHILD_METRICS_MISSING');
+    const metricsSource = result.errorKind === 'TIMEOUT' ?
+      (metrics ? 'PERIODIC_SAMPLE_NOT_FINAL' : 'UNAVAILABLE') : 'WORK_COMPLETE';
     const liveness = summarizeLiveness(probes);
     const technicalOutcome = classifyTechnicalOutcome(result,liveness);
     const summary = {
@@ -180,9 +183,14 @@ export async function runLocal(configPath) {
       workload: {workMs: config.workMs, probeEveryMs: config.probeEveryMs, probeTimeoutMs: config.probeTimeoutMs},
       work: result,
       liveness, technicalOutcome, fixtureUsedAsWorkload: false,
-      resources: {childEventLoopMaxDelayMs: metrics.eventLoopMaxDelayMs,
-        childRssBytesAfterWork: metrics.rssBytes, childPeakRssKb: metrics.peakRssKb,
-        childWorkCpuMicros: metrics.cpuMicros},
+      resources: {measurementSource: metricsSource,
+        sampleAgeMs: metrics?.receivedAtMs == null ? null : +(performance.now() - metrics.receivedAtMs).toFixed(1),
+        childEventLoopMaxDelayMs: metrics?.eventLoopMaxDelayMs ?? null,
+        childRssBytesAfterWork: metricsSource === 'WORK_COMPLETE' ? metrics.rssBytes : null,
+        childRssBytesSampled: metricsSource === 'PERIODIC_SAMPLE_NOT_FINAL' ? metrics.rssBytes : null,
+        childPeakRssKb: metrics?.peakRssKb ?? null,
+        childWorkCpuMicros: metricsSource === 'WORK_COMPLETE' ? metrics.cpuMicros : null,
+        childCpuMicrosSampled: metricsSource === 'PERIODIC_SAMPLE_NOT_FINAL' ? metrics.cpuMicros : null},
       ledgerWrite: false, releaseAuthority: false, productionTarget: false
     };
     return { ...summary, resultSha256: sha256(JSON.stringify(summary)) };
