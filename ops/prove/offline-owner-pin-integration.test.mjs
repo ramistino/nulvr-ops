@@ -89,3 +89,20 @@ test('synthetic fixture malformed input fails closed without authority',()=>{
  assert.equal(r.status,'UNVERIFIABLE');
  assert.equal(r.reason,'INTEGRATION_ERROR');
 });
+
+test('synthetic fixture never grants authority even when OBSERVED',()=>{
+ const r=verifySyntheticOwnerPinFixture(args);
+ assert.equal(r.status,'OBSERVED');
+ assert.equal(r.syntheticOnly,true);
+ assert.equal(r.ledgerWrite,false);
+ assert.equal(r.releaseAuthority,false);
+});
+test('operational boundary cannot be unlocked by synthetic-shaped receipt',()=>{
+ const synthetic=verifySyntheticOwnerPinFixture(args);
+ const forged={...synthetic,trustSourceAuthenticated:true,status:'OBSERVED'};
+ const r=verifyOfflineOwnerPin({...args,trustSourceReceipt:forged});
+ assert.equal(r.status,'UNVERIFIABLE');
+ assert.equal(r.reason,'AUTHENTICATED_TRUST_SOURCE_NOT_IMPLEMENTED');
+ assert.equal(r.ledgerWrite,false);
+ assert.equal(r.releaseAuthority,false);
+});
