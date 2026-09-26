@@ -50,17 +50,17 @@ export function verifyOwnerPin({payload,rawPayloadJson,signatureBase64,publicKey
   const key=createPublicKey(publicKeyPem);
   if(key.asymmetricKeyType!=='ed25519')return denied('ED25519_KEY_REQUIRED');
   const der=key.export({type:'spki',format:'der'});
-  if(hash(der)!==trustedKeyFingerprint||payload.signerKeySha256!==trustedKeyFingerprint)return denied('KEY_PIN_MISMATCH');
+  if(hash(der)!==trustedKeyFingerprint||parsed.signerKeySha256!==trustedKeyFingerprint)return denied('KEY_PIN_MISMATCH');
   if(typeof signatureBase64!=='string'||!/^[-A-Za-z0-9+/]{86}==$/.test(signatureBase64))return denied('SIGNATURE_FORMAT_INVALID');
   const sig=Buffer.from(signatureBase64,'base64');if(sig.length!==64||sig.toString('base64')!==signatureBase64)return denied('SIGNATURE_FORMAT_INVALID');
   const message=Buffer.concat([PREFIX,Buffer.from(canonical(parsed),'utf8')]);
   if(!verifySignature(null,message,key,sig))return denied('SIGNATURE_INVALID');
   if(!keys(actual,['sourceRepository','sourceCommit','checkerSha256','manifestSha256','evidenceRepository','evidenceCommit','evidenceTreeSha'])||
-    actual.sourceRepository!==payload.source.repository||actual.sourceCommit!==payload.source.commit||
-    !Array.isArray(actual.checkerSha256)||actual.checkerSha256.length!==2||actual.checkerSha256.some((x,i)=>x!==payload.checkerFiles[i].rawSha256)||
-    actual.manifestSha256!==payload.manifestSha256||actual.evidenceRepository!==payload.evidence.repository||
-    actual.evidenceCommit!==payload.evidence.commit||actual.evidenceTreeSha!==payload.evidence.treeSha)return denied('SNAPSHOT_MISMATCH');
-  return {status:'OBSERVED',signatureValid:true,snapshotMatches:true,verificationId:payload.verificationId,ledgerWrite:false,releaseAuthority:false,oneShotReplayEnforced:false};
+    actual.sourceRepository!==parsed.source.repository||actual.sourceCommit!==parsed.source.commit||
+    !Array.isArray(actual.checkerSha256)||actual.checkerSha256.length!==2||actual.checkerSha256.some((x,i)=>x!==parsed.checkerFiles[i].rawSha256)||
+    actual.manifestSha256!==parsed.manifestSha256||actual.evidenceRepository!==parsed.evidence.repository||
+    actual.evidenceCommit!==parsed.evidence.commit||actual.evidenceTreeSha!==parsed.evidence.treeSha)return denied('SNAPSHOT_MISMATCH');
+  return {status:'OBSERVED',signatureValid:true,snapshotMatches:true,verificationId:parsed.verificationId,ledgerWrite:false,releaseAuthority:false,oneShotReplayEnforced:false};
  }catch(e){return denied(e.message||'CHECK_ERROR')}
 }
 export const domainPrefix=PREFIX;
