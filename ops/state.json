@@ -77,8 +77,8 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "LOCAL_REGRESSION_14_OF_14_TWICE_EXACT_SOURCE_PENDING",
-          "note": "Two local regression runs on 2026-09-26 passed 14/14 each on Node v22.16.0, including work 503/reset/timeout/invalid-body and liveness. Local Git blobs 34f1df6 harness, df2e778 target, 025f36f tests DO NOT match published GitHub blobs 3a902ff, da8e47f, 1f81374. Published exact-source full test rerun remains PENDING. No CI/merge/deploy/spend; operational C4 blocked.",
+          "status": "EXACT_SOURCE_BUILD_18_OF_18_TWICE_PROVE_PENDING_OPERATIONAL_BLOCKED",
+          "note": "Exact GitHub blobs for C4 harness, target and tests reproduced byte-for-byte locally on Node v22.16.0. Two complete C4 test runs each passed 18/18, zero failures/skips. This is BUILD exact-source qualification, NOT an independent PROVE rerun and NOT operational approval. Protected owner pin, immutable staging, OS limits and workload-specific budgets remain blocked; no CI, merge, deploy or spend.",
           "local_tests": {
             "tests": 50,
             "passed": 50,
@@ -99,21 +99,24 @@
               "tests": "1f81374c7349195f7479e4b0ea2d1ae162a5a79a"
             },
             "local_blobs": {
-              "harness": "34f1df6308cb504f1ca656b710cfd8451d1edd1e",
-              "target": "df2e7780dbe77e42db82a18bb0d0b7ed89cdc932",
-              "tests": "025f36f7af6d9493a2482664f3a2490665e5d7db"
+              "harness": "3a902ff1735b9fb602b305ec37f1148d6d05ac09",
+              "target": "da8e47f1cfd776afa629a50ecfc05f83a44bf6cd",
+              "tests": "1f81374c7349195f7479e4b0ea2d1ae162a5a79a"
             },
+            "node": "v22.16.0",
             "local_regression_runs": [
               {
-                "passed": 14,
-                "failed": 0
+                "passed": 18,
+                "failed": 0,
+                "skipped": 0
               },
               {
-                "passed": 14,
-                "failed": 0
+                "passed": 18,
+                "failed": 0,
+                "skipped": 0
               }
             ],
-            "status": "PUBLISHED_EXACT_SOURCE_UNVERIFIED"
+            "status": "EXACT_SOURCE_BUILD_PASS_INDEPENDENT_PROVE_PENDING"
           },
           "local_equivalent_recheck": {
             "status": "PASS_LOCAL_EQUIVALENT_NOT_EXACT_SOURCE",
