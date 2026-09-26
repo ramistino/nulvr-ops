@@ -1,8 +1,8 @@
 // C3 local-only durable replay prototype. Not a production authority or protected ledger.
 // Root directory must be provisioned independently on a trusted filesystem by the operator.
-import {open,mkdir,stat,realpath} from 'node:fs/promises';
+import {open,stat,realpath} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
-import {join,resolve,dirname} from 'node:path';
+import {join,resolve} from 'node:path';
 const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const deny=reason=>({status:'UNVERIFIABLE',reason,ledgerWrite:false,releaseAuthority:false});
 export async function reserveReplayId({verificationId,registryRoot}={}){
@@ -17,7 +17,7 @@ export async function reserveReplayId({verificationId,registryRoot}={}){
   const name=createHash('sha256').update(verificationId).digest('hex')+'.reserved';
   // O_EXCL prevents two cooperating local processes from claiming the same ID.
   fd=await open(join(root,name),'wx',0o600);
-  await fd.writeFile(verificationId+'\\n','utf8');
+  await fd.writeFile(verificationId+'\n','utf8');
   await fd.sync();
   await fd.close();fd=undefined;
   const dir=await open(root,'r');
