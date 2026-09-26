@@ -77,7 +77,7 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "EXACT_SOURCE_TECHNICAL_RERUN_PASS_GUARD_REVIEWED_OPERATIONAL_BLOCKED",
+          "status": "EXACT_SOURCE_TEST_AND_12_RUN_PROFILE_COMPLETE_OPERATIONAL_BLOCKED",
           "note": "Fresh source-bound PROVE-style technical rerun on Node v22.16.0: Git blob hashes match GitHub 3a902ff/da8e47f/1f81374; 18/18 passed, 0 failed/skipped, log SHA256 e26c1a041f383a81de5aaf85a98d9ebfa347cd2f254d191c268526e0b2ae4ef8. Static GUARD review: child binds 127.0.0.1, fetches only constructed loopback base, no writes, verdict flags false, SIGTERM/SIGKILL fallback. This is same assistant/session, NOT independent organizational PROVE/GUARD signoff. OS RSS/CPU quotas, protected owner pin, immutable staging, workload budgets and external review remain pending. No CI/merge/deploy/spend.",
           "local_tests": {
             "tests": 18,
@@ -160,6 +160,17 @@
               "dc7ab0207c9a8e6724ab9b414fa27585085c10df95aa7f8dbb160c057b792101"
             ],
             "limitation": "Historical older revision only. Current exact-source C4 qualification is tracked in local_tests and pending_verification."
+          },
+          "synthetic_profile": {
+            "runs": 12,
+            "scenarios": 6,
+            "repetitions": 2,
+            "source_blobs_match": true,
+            "report": "ops/load-tests/synthetic-profile-2026-09-26.md",
+            "report_commit": "421bd0072067e2a26c17ae3ac2e0d7cd5101d4c8",
+            "local_raw_json_sha256": "90bfc7591e687c4534af3930fa7d2ce13f31683e724a83aba0ad088f5efdafe0",
+            "observation": "Late 200 under blocked CPU had 3 watchdog failures per run; work503/reset/timeout/invalid-body fail work independently; no operational PASS",
+            "limitation": "Two synthetic runs per scenario only; timeout child resource metrics missing; no OS quotas or approved workload budgets; raw JSON remains local"
           }
         },
         {
