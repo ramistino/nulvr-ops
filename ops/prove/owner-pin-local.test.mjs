@@ -32,3 +32,12 @@ test('negative validity policy is rejected',()=>assert.throws(()=>validatePayloa
 test('replay is not claimed enforced',()=>{const a=verifyOwnerPin(args),b=verifyOwnerPin(args);assert.equal(a.status,'OBSERVED');assert.equal(b.status,'OBSERVED');assert.equal(a.oneShotReplayEnforced,false)});
 test('unicode key sorting follows UTF-16 order',()=>assert.equal(canonical({'\uE000':1,'\u{10000}':2}),'{"\u{10000}":2,"\uE000":1}'));
 test('unpaired surrogate rejected',()=>assert.throws(()=>canonical('\uD800'),/INVALID_UNICODE/));
+
+test('noncanonical Base64 alias of a valid signature is rejected',()=>{
+ const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+ const idx=alphabet.indexOf(signatureBase64[85]);
+ const alias=signatureBase64.slice(0,85)+alphabet[(idx&48)|((idx+1)&15)]+signatureBase64.slice(86);
+ assert.notEqual(alias,signatureBase64);
+ assert.deepEqual(Buffer.from(alias,'base64'),Buffer.from(signatureBase64,'base64'));
+ assert.equal(verifyOwnerPin({...args,signatureBase64:alias}).reason,'SIGNATURE_FORMAT_INVALID');
+});
