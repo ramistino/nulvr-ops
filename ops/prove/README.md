@@ -37,7 +37,7 @@ Founder T2 authorization covers **local-only C3 implementation**, not trusted ac
 
 ## Remaining trust and activation gates
 
-1. Founder-approved independent key custody, public-key pin, canonical signed owner record, protected owner-only publication, immutable private evidence retrieval, expiry/replay policy and separate T2 implementation GO.
+1. **Local-only T2 implementation GO is already granted and exercised.** A **new, separate founder approval** is required before provisioning or activating independent key custody, the founder-approved public-key pin, protected owner-only publication, immutable private evidence retrieval, or production expiry/replay enforcement. No agent may generate or claim the founder key.
 2. Harden ancestor-directory TOCTOU and hostile-filesystem isolation. The mutable synthetic staging root is not a trusted atomic snapshot.
 3. Separate Architecture Lock for any protected verdict writer. Neither `ASSERTION_PASS` nor a signed owner pin alone can write `VERIFIED`.
 4. Diagnose PR #7 pre-job `startup_failure` and cost controls before any GitHub Actions/PR trigger. ALPS-based qualification is a later PRODUCT-linked gate, not a blocker for synthetic company development.
