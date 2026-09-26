@@ -76,3 +76,16 @@ test('hostile Proxy cannot escape operational boundary',()=>{
  assert.equal(r.status,'UNVERIFIABLE');
  assert.equal(r.reason,'INTEGRATION_INPUT_ERROR');
 });
+
+test('synthetic fixture malformed input fails closed without authority',()=>{
+ for(const input of [null,[],false,7]){
+  const r=verifySyntheticOwnerPinFixture(input);
+  assert.equal(r.status,'UNVERIFIABLE');
+  assert.equal(r.reason,'INVALID_SYNTHETIC_INPUT');
+  assert.equal(r.ledgerWrite,false);
+  assert.equal(r.releaseAuthority,false);
+ }
+ const r=verifySyntheticOwnerPinFixture(new Proxy({}, {get(){throw new Error('hostile')}}));
+ assert.equal(r.status,'UNVERIFIABLE');
+ assert.equal(r.reason,'INTEGRATION_ERROR');
+});
