@@ -6,8 +6,14 @@ import {createHash} from 'node:crypto';
 import {join,resolve,dirname} from 'node:path';
 const ID=/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const deny=reason=>({status:'UNVERIFIABLE',reason,ledgerWrite:false,releaseAuthority:false});
-export async function reserveReplayId({verificationId,registryRoot}={}){
- if(!ID.test(verificationId||''))return deny('INVALID_VERIFICATION_ID');
+export async function reserveReplayId(input={}){
+ let verificationId,registryRoot;
+ try{
+  if(!input||typeof input!=='object'||Array.isArray(input))return deny('INVALID_REGISTRY_INPUT');
+  ({verificationId,registryRoot}=input);
+  if(typeof verificationId!=='string'||!ID.test(verificationId))return deny('INVALID_VERIFICATION_ID');
+ }catch{return deny('INVALID_REGISTRY_INPUT')}
+
  if(typeof registryRoot!=='string'||!registryRoot.startsWith('/'))return deny('EXTERNAL_REGISTRY_ROOT_REQUIRED');
  const root=resolve(registryRoot);
  let fd;
