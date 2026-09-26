@@ -79,3 +79,25 @@ test('post-reservation implementation binds directory identity to original dev a
  assert.match(source,/after\.ino!==meta\.ino/);
  assert.match(source,/after\.uid!==meta\.uid/);
 });
+
+test('null, arrays and primitives fail closed at replay boundary',async()=>{
+ for(const input of [null,[],false,42,'invalid']){
+  const r=await reserveReplayId(input);
+  assert.equal(r.status,'UNVERIFIABLE');
+  assert.equal(r.reason,'INVALID_REGISTRY_INPUT');
+  assert.equal(r.ledgerWrite,false);
+  assert.equal(r.releaseAuthority,false);
+ }
+});
+test('hostile replay input getters and proxies cannot throw or grant authority',async()=>{
+ for(const input of [
+  {get verificationId(){throw Error('hostile getter')}},
+  new Proxy({}, {get(){throw Error('hostile proxy')}})
+ ]){
+  const r=await reserveReplayId(input);
+  assert.equal(r.status,'UNVERIFIABLE');
+  assert.equal(r.reason,'INVALID_REGISTRY_INPUT');
+  assert.equal(r.ledgerWrite,false);
+  assert.equal(r.releaseAuthority,false);
+ }
+});
