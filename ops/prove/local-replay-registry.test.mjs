@@ -71,3 +71,11 @@ test('reservation file is private',()=>withRoot(async root=>{
  const [name]=await readdir(root); const meta=await fs.lstat(join(root,name));
  assert.equal(meta.mode&0o777,0o600);
 }));
+
+test('post-reservation implementation binds directory identity to original dev and ino',async()=>{
+ const fs=await import('node:fs/promises');
+ const source=await fs.readFile(new URL('./local-replay-registry.mjs',import.meta.url),'utf8');
+ assert.match(source,/after\.dev!==meta\.dev/);
+ assert.match(source,/after\.ino!==meta\.ino/);
+ assert.match(source,/after\.uid!==meta\.uid/);
+});
