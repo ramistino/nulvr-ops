@@ -26,3 +26,14 @@ test('no caller supplied verification status is accepted',()=>{const r=verifyOff
 
 test('caller-supplied actual cannot disagree with anchored snapshot',()=>assert.equal(verifyOfflineOwnerPin({...args,actual:{...actual,sourceCommit:'0'.repeat(40)}}).reason,'SNAPSHOT_ACTUAL_MISMATCH'));
 test('duplicate keys inside snapshot are rejected',()=>{const forged='{"sourceCommit":"0",'+raw.slice(1);const result=verifyOfflineOwnerPin({...args,snapshot:{...snapshot,raw:forged},anchor:{...anchor,snapshotSha256:h(forged)}});assert.equal(result.status,'UNVERIFIABLE')});
+
+test('integration fails closed without authenticated trust source',()=>{
+ const r=verifyOfflineOwnerPin(args);
+ assert.equal(r.status,'UNVERIFIABLE');
+ assert.equal(r.reason,'AUTHENTICATED_TRUST_SOURCE_REQUIRED');
+});
+test('caller-crafted trust receipt cannot unlock integration',()=>{
+ const r=verifyOfflineOwnerPin({...args,trustSourceReceipt:{trustSourceAuthenticated:true}});
+ assert.equal(r.status,'UNVERIFIABLE');
+ assert.equal(r.reason,'AUTHENTICATED_TRUST_SOURCE_NOT_IMPLEMENTED');
+});
