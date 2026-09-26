@@ -23,6 +23,18 @@ Only use unprivileged synthetic fixtures and independently pre-approved pins. Li
 - Independent source-bound technical PROVE: [`2169ecc`](https://github.com/ramistino/nulvr-ops/commit/2169ecce4b8156eebd4eaa7cdcff2e3bbb8eb82b), seven exact source blobs and **42/42** passing combined offline tests on Node v22.16.0. This count includes five C4 local-watchdog tests and must not be described as 42 C3-only tests.
 - Unsigned [owner-pin v0.1a design](./owner-pin-design-v0.1a.md) and [schema](./owner-pin-design-v0.1a.schema.json): independently reviewed **19/19 structural cases**. Format validation is not cryptographic attestation.
 
+## Local Owner Pin implementation — current branch
+
+Founder T2 authorization covers **local-only C3 implementation**, not trusted activation. The branch now contains `owner-pin-local.mjs`, strict raw-JSON preflight, an offline rehearsal, `offline-owner-pin-integration.mjs`, `trust-source-contract.mjs`, and `local-replay-registry.mjs`. The historical **42/42** result above belongs to the earlier v0.2a combined suite; it is not the current Owner Pin test count.
+
+- `verifySyntheticOwnerPinFixture` exercises ephemeral Ed25519 signatures, pinned snapshot comparisons, expiry and replay rejection. Its `OBSERVED` result is explicitly synthetic and has neither ledger-write nor release authority.
+- `verifyOfflineOwnerPin` is the operational entry point. It currently returns `UNVERIFIABLE` because `trust-source-contract.mjs` deliberately has no authenticated positive branch. Caller-supplied labels, receipts, hostile getters and proxies cannot grant authority.
+- `reserveReplayId` is a local, single-filesystem O_EXCL/fsync prototype with root and ancestor checks. `RESERVED_LOCAL_ONLY` is **not** a protected, transactional multi-host replay decision.
+- The local review reported **93/93** combined tests passing; the trust-contract and integration subset was source-matched to GitHub at **27/27**. Do not extrapolate that subset to a new full-branch source-bound qualification after subsequent changes.
+- See [trust-root-provisioning-gate.md](./trust-root-provisioning-gate.md) for the founder-controlled public-key pin, independently acquired immutable evidence, protected trust root, and transactional single-writer ledger required before any future trusted result.
+
+**Activation status: BLOCKED.** No protected `VERIFIED` writer, merge, deployment, paid CI, or production authority has been enabled.
+
 ## Remaining trust and activation gates
 
 1. Founder-approved independent key custody, public-key pin, canonical signed owner record, protected owner-only publication, immutable private evidence retrieval, expiry/replay policy and separate T2 implementation GO.
