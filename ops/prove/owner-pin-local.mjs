@@ -19,7 +19,7 @@ export function canonical(value,seen=new Set()){
  if(typeof value==='number'){if(!Number.isFinite(value)||Number.isInteger(value)&&!Number.isSafeInteger(value))invalid('INVALID_NUMBER');return JSON.stringify(value)}
  if(typeof value!=='object'||seen.has(value))invalid('NON_JSON_OR_CYCLE');
  seen.add(value);let result;
- if(Array.isArray(value))result='['+value.map(v=>canonical(v,seen)).join(',')+']';
+ if(Array.isArray(value)){if(Object.keys(value).filter(k=>/^(0|[1-9][0-9]*)$/.test(k)).length!==value.length)invalid('SPARSE_ARRAY');result='['+Array.from(value,v=>canonical(v,seen)).join(',')+']';}
  else {const k=Object.keys(value).sort((a,b)=>a<b?-1:a>b?1:0);result='{'+k.map(key=>{validString(key);return JSON.stringify(key)+':'+canonical(value[key],seen)}).join(',')+'}'}
  seen.delete(value);return result;
 }
