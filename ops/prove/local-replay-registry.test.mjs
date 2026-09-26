@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import {mkdtemp,chmod,rm,readdir,readFile,symlink} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+const execFileAsync=promisify(execFile);
 import {reserveReplayId} from './local-replay-registry.mjs';
 const id='12345678-1234-4234-8234-123456789abc';
 async function withRoot(fn){const root=await mkdtemp(join(tmpdir(),'nulvr-replay-'));await chmod(root,0o700);try{await fn(root)}finally{await rm(root,{recursive:true,force:true})}}
@@ -25,4 +28,12 @@ test('reservation stores the exact ID and a newline',()=>withRoot(async root=>{
  assert.equal((await reserveReplayId({verificationId:id,registryRoot:root})).status,'RESERVED_LOCAL_ONLY');
  const files=await readdir(root);
  assert.equal(await readFile(join(root,files[0]),'utf8'),id+'\n');
+}));
+
+test('separate processes cannot both reserve the same ID',()=>withRoot(async root=>{
+ const code="import {reserveReplayId} from "+JSON.stringify(new URL('./local-replay-registry.mjs',import.meta.url).href)+";const r=await reserveReplayId({verificationId:process.argv[1],registryRoot:process.argv[2]});console.log(r.status+':'+(r.reason||''));";
+ const outcomes=await Promise.all(Array.from({length:8},()=>execFileAsync(process.execPath,['--input-type=module','-e',code,id,root])));
+ const statuses=outcomes.map(x=>x.stdout.trim());
+ assert.equal(statuses.filter(x=>x==='RESERVED_LOCAL_ONLY:').length,1);
+ assert.equal(statuses.filter(x=>x==='UNVERIFIABLE:REPLAY_DETECTED').length,7);
 }));
