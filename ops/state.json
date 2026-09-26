@@ -77,8 +77,8 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "LOCAL_WORK_OUTCOME_PATCH_STAGED_AWAITING_FULL_EXACT_SOURCE_TEST",
-          "note": "Founder authorized C4 local-only implementation. Branch now includes /work 503, reset, timeout and invalid-body injection plus independent work/liveness classification and five new tests. Exact-source full suite has not yet been rerun against this new branch; prior 50/50 result applies only to earlier revision. Operational use remains blocked by protected owner pin, immutable staging, OS limits and workload budgets. No CI, merge, deploy or spend.",
+          "status": "LOCAL_REGRESSION_14_OF_14_TWICE_EXACT_SOURCE_PENDING",
+          "note": "Two local regression runs on 2026-09-26 passed 14/14 each on Node v22.16.0, including work 503/reset/timeout/invalid-body and liveness. Local Git blobs 34f1df6 harness, df2e778 target, 025f36f tests DO NOT match published GitHub blobs 3a902ff, da8e47f, 1f81374. Published exact-source full test rerun remains PENDING. No CI/merge/deploy/spend; operational C4 blocked.",
           "local_tests": {
             "tests": 50,
             "passed": 50,
@@ -93,14 +93,27 @@
             "trust_level": "OFFLINE_SYNTHETIC_TECHNICAL_ONLY"
           },
           "pending_verification": {
-            "head_at_patch": "320b3ad636d6bf69ee29f476d5d1074f19670c32",
-            "tests_added": 5,
-            "source_paths": [
-              "ops/load-tests/local-harness.mjs",
-              "ops/load-tests/local-target.mjs",
-              "ops/tests/local-harness.test.mjs"
+            "github_blobs": {
+              "harness": "3a902ff1735b9fb602b305ec37f1148d6d05ac09",
+              "target": "da8e47f1cfd776afa629a50ecfc05f83a44bf6cd",
+              "tests": "1f81374c7349195f7479e4b0ea2d1ae162a5a79a"
+            },
+            "local_blobs": {
+              "harness": "34f1df6308cb504f1ca656b710cfd8451d1edd1e",
+              "target": "df2e7780dbe77e42db82a18bb0d0b7ed89cdc932",
+              "tests": "025f36f7af6d9493a2482664f3a2490665e5d7db"
+            },
+            "local_regression_runs": [
+              {
+                "passed": 14,
+                "failed": 0
+              },
+              {
+                "passed": 14,
+                "failed": 0
+              }
             ],
-            "status": "UNVERIFIED_NEW_REVISION"
+            "status": "PUBLISHED_EXACT_SOURCE_UNVERIFIED"
           },
           "local_equivalent_recheck": {
             "status": "PASS_LOCAL_EQUIVALENT_NOT_EXACT_SOURCE",
