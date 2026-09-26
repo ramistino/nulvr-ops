@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "nulvr.owner-pin-design.v0.1",
+  "verificationId": "12345678-1234-4abc-8abc-123456789abc",
+  "approvedScope": "SYNTHETIC_OFFLINE_ONLY",
+  "source": {
+    "repository": "example/synthetic-fixtures",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "checkerFiles": [
+    {
+      "path": "ops/checks/prove-fixture.mjs",
+      "rawSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "path": "ops/checks/assertions-v02a.mjs",
+      "rawSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    }
+  ],
+  "manifestPath": "manifest.json",
+  "manifestSha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "evidence": {
+    "provider": "GITHUB_GIT_TREE",
+    "repository": "example/private-fixture-repository",
+    "commit": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "treeSha": "ffffffffffffffffffffffffffffffffffffffff"
+  },
+  "assertionPolicy": "C3_SYNTHETIC_V0_2A",
+  "approvedAt": "2026-09-26T00:00:00Z",
+  "expiresAt": "2026-09-27T00:00:00Z",
+  "signerKeySha256": "0000000000000000000000000000000000000000000000000000000000000000"
+}
