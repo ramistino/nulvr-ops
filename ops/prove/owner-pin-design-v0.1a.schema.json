@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nulvr.example/schemas/owner-pin-design-v0.1a.json",
+  "title": "NULVR C3 Owner Pin — UNSIGNED DESIGN CONTRACT v0.1a",
+  "description": "Format-only proposed owner-signable payload. It cannot prove owner identity, signature validity, immutable storage, runtime authority or trusted VERIFIED.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "verificationId",
+    "approvedScope",
+    "source",
+    "checkerFiles",
+    "manifestPath",
+    "manifestSha256",
+    "evidence",
+    "assertionPolicy",
+    "approvedAt",
+    "expiresAt",
+    "signerKeySha256"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "nulvr.owner-pin-design.v0.1a"
+    },
+    "verificationId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "approvedScope": {
+      "const": "SYNTHETIC_OFFLINE_ONLY"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "commit"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}/[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$",
+          "maxLength": 160
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "checkerFiles": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "rawSha256"
+          ],
+          "properties": {
+            "path": {
+              "const": "ops/checks/prove-fixture.mjs"
+            },
+            "rawSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "rawSha256"
+          ],
+          "properties": {
+            "path": {
+              "const": "ops/checks/assertions-v02a.mjs"
+            },
+            "rawSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      ],
+      "items": false
+    },
+    "manifestPath": {
+      "const": "manifest.json"
+    },
+    "manifestSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "repository",
+        "commit",
+        "treeSha"
+      ],
+      "properties": {
+        "provider": {
+          "const": "GITHUB_GIT_TREE"
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}/[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$",
+          "maxLength": 160
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "treeSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "assertionPolicy": {
+      "const": "C3_SYNTHETIC_V0_2A"
+    },
+    "approvedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "signerKeySha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}
