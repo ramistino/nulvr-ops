@@ -35,8 +35,8 @@
           "title": "Trusted PROVE checker on synthetic fixtures",
           "tier": "T2",
           "lane": "PROVE",
-          "status": "SYNTHETIC_PASS_OWNER_PIN_V01A_SCHEMA_REVIEWED_DESIGN_ONLY",
-          "note": "Existing synthetic v0.2a technical PROVE 42/42 unchanged. Owner-pin v0.1a unsigned JSON Schema exact Git blob 6874400d... passed fresh source-bound 19/19 structural cases. Founder key custody, protected publication/replay and trusted writer remain unimplemented and need separate GO.",
+          "status": "LOCAL_OWNER_PIN_IMPLEMENTED_SYNTHETIC_TESTS_PASS_TRUSTED_ACTIVATION_BLOCKED",
+          "note": "Founder-approved T2 local-only implementation is staged: Ed25519 Owner Pin, strict JSON preflight, synthetic-only integration, fail-closed operational trust-source contract, and single-filesystem local replay prototype. Historical v0.2a combined 42/42 and unsigned schema 19/19 remain separate evidence. Latest reported local C3 suite 93/93; trust-contract plus integration exact-source subset 27/27 at review. Protected founder key, immutable independent acquisition, transactional replay ledger and protected VERIFIED writer are NOT implemented. No CI, merge, deploy, or spend.",
           "local_tests": {
             "count": 42,
             "passed": 42,
@@ -47,6 +47,26 @@
             "assertion_tests_blob": "ca76b8f558f932539ec4e39540fafd92362ba11f",
             "provenance": "EXACT_GIT_BLOB_LOCAL_TEST_EXECUTION",
             "trust_level": "SYNTHETIC_ONLY_INDEPENDENT_TECHNICAL_PROVE_PASS_TRUSTED_ACTIVATION_PENDING"
+          },
+          "local_owner_pin": {
+            "scope": "FOUNDER_T2_LOCAL_ONLY",
+            "synthetic_fixture": "IMPLEMENTED_OBSERVED_NO_AUTHORITY",
+            "operational_verifier": "FAIL_CLOSED_UNVERIFIABLE",
+            "replay_registry": "LOCAL_SINGLE_FILESYSTEM_PROTOTYPE_NOT_PROTECTED",
+            "trust_source": "NO_AUTHENTICATED_POSITIVE_BRANCH",
+            "protected_ledger_writer": "NOT_IMPLEMENTED",
+            "reported_local_suite": {
+              "passed": 93,
+              "failed": 0,
+              "runtime": "node-v22.16.0",
+              "qualification": "LOCAL_REVIEW_NOT_PRODUCTION"
+            },
+            "exact_source_subset": {
+              "passed": 27,
+              "failed": 0,
+              "scope": "TRUST_CONTRACT_AND_OWNER_PIN_INTEGRATION_AT_REVIEW"
+            },
+            "activation": "BLOCKED_SEPARATE_FOUNDER_APPROVAL_REQUIRED"
           }
         },
         {
