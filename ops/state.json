@@ -77,7 +77,7 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "CGROUP_READINESS_DIAGNOSTIC_QUALIFIED_DEDICATED_QUOTA_BLOCKED",
+          "status": "CGROUP_DIAGNOSTIC_PATH_HARDENED_27_TESTS_PASS_OPERATIONAL_BLOCKED",
           "note": "Branch-only C4 timeout telemetry patch adds 100ms periodic IPC resource samples, preserves last sample on synthetic work timeout, explicitly distinguishes sampled values from final workComplete metrics. Exact local patch blobs match GitHub: harness 450ebeb5, target 75cd8361, tests 15b1897a; Node v22.16.0 two complete local runs 18/18 each, zero failures/skips. This is same-session BUILD evidence, not independent PROVE/GUARD signoff. Periodic samples are not OS RSS/CPU limits, may be absent if event loop stalls or child dies; no production authority. No CI/merge/deploy/spend.",
           "local_tests": {
             "tests": 18,
@@ -210,8 +210,8 @@
             "source_status": "LOCAL_ARTIFACT_NOT_COMMITTED"
           },
           "cgroup_readiness": {
-            "status": "EXACT_SOURCE_LOCAL_DIAGNOSTIC_PASS_NO_QUOTA_AUTHORITY",
-            "source_blob": "c280d43e5d9108a209b2a68ba1300eee678ab30e",
+            "status": "ADVERSARIAL_PATH_HARDENING_EXACT_SOURCE_LOCAL_PASS_NO_QUOTA_AUTHORITY",
+            "source_blob": "d20d1130797720b84ff8f10bf5ffe1e1d47fc304",
             "test_blob": "fd9d6d34e64778f965734bf5000518c0379868f7",
             "report": "ops/load-tests/cgroup-readiness-qualification-2026-09-26.md",
             "report_commit": "2431a2ecd383688aacc64b29d21124a1ee30ca94",
@@ -231,7 +231,30 @@
             ],
             "finding": "cpu/memory controllers present; shared 4GiB and 4CPU limits are not dedicated; cgroup.procs not writable in prior check; ownership mode alone does not prove delegation",
             "per_child_quota_verified": false,
-            "operational_pass": false
+            "operational_pass": false,
+            "adversarial_test_blob": "77d3f243052d0b76ab2f4e779f66e0d8bf54fbf0",
+            "tests_total": 27,
+            "local_runs": [
+              {
+                "passed": 27,
+                "failed": 0,
+                "skipped": 0,
+                "log_sha256": "e81174bc1cbb8916e460d82639f9f7f72dcb16b68a66ac7904b31ee43f7f1f58"
+              },
+              {
+                "passed": 27,
+                "failed": 0,
+                "skipped": 0,
+                "log_sha256": "3027cfca80070e1c15482ecd30974f63de1d5ca53b47c5a7c1c548687f1f7a30"
+              }
+            ],
+            "hardening": [
+              "reject duplicate cgroup v2 memberships",
+              "reject symlinked member paths",
+              "reject control characters",
+              "reject relative root"
+            ],
+            "limitation": "Read-only source hardening, not a proof of race-free ancestor resolution or dedicated cgroup delegation; same-session local tests only"
           }
         },
         {
