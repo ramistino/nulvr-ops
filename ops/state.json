@@ -77,8 +77,8 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "EXACT_SOURCE_BUILD_18_OF_18_TWICE_PROVE_PENDING_OPERATIONAL_BLOCKED",
-          "note": "Exact GitHub blobs for C4 harness, target and tests reproduced byte-for-byte locally on Node v22.16.0. Two complete C4 test runs each passed 18/18, zero failures/skips. This is BUILD exact-source qualification, NOT an independent PROVE rerun and NOT operational approval. Protected owner pin, immutable staging, OS limits and workload-specific budgets remain blocked; no CI, merge, deploy or spend.",
+          "status": "EXACT_SOURCE_TECHNICAL_RERUN_PASS_GUARD_REVIEWED_OPERATIONAL_BLOCKED",
+          "note": "Fresh source-bound PROVE-style technical rerun on Node v22.16.0: Git blob hashes match GitHub 3a902ff/da8e47f/1f81374; 18/18 passed, 0 failed/skipped, log SHA256 e26c1a041f383a81de5aaf85a98d9ebfa347cd2f254d191c268526e0b2ae4ef8. Static GUARD review: child binds 127.0.0.1, fetches only constructed loopback base, no writes, verdict flags false, SIGTERM/SIGKILL fallback. This is same assistant/session, NOT independent organizational PROVE/GUARD signoff. OS RSS/CPU quotas, protected owner pin, immutable staging, workload budgets and external review remain pending. No CI/merge/deploy/spend.",
           "local_tests": {
             "tests": 50,
             "passed": 50,
@@ -98,25 +98,22 @@
               "target": "da8e47f1cfd776afa629a50ecfc05f83a44bf6cd",
               "tests": "1f81374c7349195f7479e4b0ea2d1ae162a5a79a"
             },
-            "local_blobs": {
-              "harness": "3a902ff1735b9fb602b305ec37f1148d6d05ac09",
-              "target": "da8e47f1cfd776afa629a50ecfc05f83a44bf6cd",
-              "tests": "1f81374c7349195f7479e4b0ea2d1ae162a5a79a"
-            },
             "node": "v22.16.0",
-            "local_regression_runs": [
-              {
-                "passed": 18,
-                "failed": 0,
-                "skipped": 0
-              },
-              {
-                "passed": 18,
-                "failed": 0,
-                "skipped": 0
-              }
-            ],
-            "status": "EXACT_SOURCE_BUILD_PASS_INDEPENDENT_PROVE_PENDING"
+            "fresh_technical_rerun": {
+              "passed": 18,
+              "failed": 0,
+              "skipped": 0,
+              "log_sha256": "e26c1a041f383a81de5aaf85a98d9ebfa347cd2f254d191c268526e0b2ae4ef8"
+            },
+            "guard_static_review": "NO_REMOTE_TARGET_OR_LEDGER_WRITE_IN_C4_SOURCE",
+            "remaining": [
+              "independent reviewer signoff",
+              "protected owner pin",
+              "immutable staging",
+              "OS resource quotas",
+              "approved workload budgets",
+              "separate operational T2 GO"
+            ]
           },
           "local_equivalent_recheck": {
             "status": "PASS_LOCAL_EQUIVALENT_NOT_EXACT_SOURCE",
