@@ -1,0 +1,50 @@
+{
+  "schema": "nulvr.ops.portfolio.v0.1",
+  "snapshotKind": "PLANNING_ONLY",
+  "asOf": "2026-09-26",
+  "tasks": [
+    {
+      "id": "OPS-001", "lane": "COMPANY", "owner": "GUARD", "status": "BLOCKED",
+      "title": "Diagnose PR #7 CI startup_failure and confirm billing eligibility before reruns",
+      "blocker": { "code": "ZERO_JOB_STARTUP_FAILURE_UNDIAGNOSED" },
+      "dependsOn": [], "activationGates": ["NO_CHARGE_VERIFIED_BEFORE_ANY_CI_RERUN"]
+    },
+    {
+      "id": "OPS-002", "lane": "COMPANY", "owner": "BUILD", "status": "IN_PROGRESS",
+      "title": "Build isolated read-only company portfolio and task handoff candidate",
+      "dependsOn": [], "activationGates": ["PROVE_REVIEW", "FOUNDER_T2_ARCHITECTURE_LOCK", "CI_REAL_PASS_BEFORE_RELEASE"]
+    },
+    {
+      "id": "OPS-003", "lane": "COMPANY", "owner": "PROVE", "status": "READY",
+      "title": "Prototype trusted verifier with synthetic tamper/failure/restart fixtures",
+      "dependsOn": [], "activationGates": ["PROTECTED_VERDICT_WRITE_PATH_PROVEN", "FOUNDER_T2_ARCHITECTURE_LOCK"]
+    },
+    {
+      "id": "OPS-004", "lane": "COMPANY", "owner": "GUARD", "status": "PLANNED",
+      "title": "Develop minimum constitution CI checks once verifier is available",
+      "dependsOn": ["OPS-003"], "activationGates": ["CI_BILLING_ELIGIBILITY_VERIFIED", "PROVE_EVIDENCE_QUALITY_REVIEW"]
+    },
+    {
+      "id": "OPS-005", "lane": "COMPANY", "owner": "BUILD", "status": "PLANNED",
+      "title": "Orchestrator implementation and bounded read-only pilot after qualification",
+      "dependsOn": ["OPS-003", "OPS-004"],
+      "activationGates": ["TRUSTED_CHECKER_14_DAY_ALPS_QUALIFICATION", "ZERO_FALSE_VERIFIED", "FOUNDER_READ_ONLY_PILOT_APPROVAL"]
+    },
+    {
+      "id": "ALPS-418", "lane": "PRODUCT", "owner": "BUILD", "status": "BLOCKED",
+      "title": "Close ALPS 4.18 using concurrent-liveness and evidence-integrity proof",
+      "blocker": { "code": "PHASE414_EVENT_LOOP_STALL_POST_DEPLOY_FAILED" },
+      "dependsOn": [], "activationGates": ["EXACT_MAIN_AUTHORITY_CANONICAL_ARTIFACT"]
+    },
+    {
+      "id": "ALPS-002", "lane": "PRODUCT", "owner": "PROVE", "status": "READY",
+      "title": "Prepare reusable isolated load-test design and measured performance budgets",
+      "dependsOn": [], "activationGates": ["T2_ARCHITECTURE_LOCK", "LOAD_TESTS_MEASURED_OFF_PRODUCTION"]
+    },
+    {
+      "id": "LAB-001", "lane": "PRODUCT", "owner": "BUILD", "status": "READY",
+      "title": "Design read-only Laboratory UI contract without a second evidence authority",
+      "dependsOn": [], "activationGates": ["ALPS_READ_ONLY_INTEGRATION_ACCEPTANCE"]
+    }
+  ]
+}
