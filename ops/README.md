@@ -53,9 +53,9 @@ Use [`handoff-v1.1.schema.json`](./handoff-v1.1.schema.json) for new handoffs; t
 | Priority | Work item | Dependency | Current gate |
 |---:|---|---|---|
 | C1 | Diagnose PR #7 zero-job CI startup failure | None / read-only first | ACTIVE |
-| C2 | Implement machine-readable handoff/state contract | None | ACTIVE on this branch |
-| C3 | Trusted PROVE checker on synthetic fixtures | C2 | READY FOR DESIGN |
-| C4 | Reusable isolated load-test harness | C2 | READY FOR DESIGN (T2 before activation) |
+| C2 | Machine-readable handoff/state contract | None | v1.1 STAGED; independent structural PROVE 17/17; no verdict authority |
+| C3 | Trusted PROVE checker on synthetic fixtures | C2 | Synthetic v0.2a technical PROVE 42/42; unsigned owner-pin v0.1a schema 19/19; trusted activation BLOCKED |
+| C4 | Reusable isolated load-test harness | C2 | Localhost synthetic technical PROVE 50/50; operational activation BLOCKED |
 | C5 | Minimal governance CI | C3 + T2 Architecture Lock | BLOCKED FROM ACTIVATION |
 | C6 | ALPS qualification of PROVE | trusted checker + suitable ALPS evidence | FUTURE GATE |
 | C7 | Read-only Orchestrator pilot | 14-day qualification | NOT ACTIVATED |
