@@ -1,0 +1,33 @@
+{
+  "work_id": "C3-TRUSTED-ACTIVATION",
+  "track": "COMPANY",
+  "tier": "T2",
+  "owner_lane": "PROVE",
+  "repository": "ramistino/nulvr-ops",
+  "base_commit": "a244fea415d14fc8d044e9fd187d1cf4927b27c6",
+  "acceptance_criteria": [
+    "Independent architecture review closes D01-D07 with reproducible negative tests and exact-source evidence",
+    "Founder separately authorizes any protected implementation or provisioning and defines explicit cost ceiling",
+    "All T01-T10 gates pass before any separate founder activation approval",
+    "Synthetic OBSERVED or local replay reservation never grants protected VERIFIED or release authority"
+  ],
+  "visible_inputs": [
+    "ops/prove/trusted-activation-acceptance-v0.1.md",
+    "ops/prove/trusted-activation-architecture-review-v0.1.md",
+    "ops/prove/trusted-activation-critical-decisions-v0.2.md",
+    "C3 local exact-source suite: 114/114 Node v22.16.0; synthetic only"
+  ],
+  "evidence": [
+    {
+      "kind": "GIT_COMMIT",
+      "ref": "ed69ef6bf7d2ab918f113ed897c967755b53f4ca"
+    },
+    {
+      "kind": "DESIGN_REVIEW",
+      "ref": "ops/prove/trusted-activation-architecture-review-v0.1.md"
+    }
+  ],
+  "status": "BLOCKED",
+  "next_gate": "Independent architecture review and explicit founder T2 approval for any protected implementation; activation requires a later separate founder approval",
+  "authority_required": "FOUNDER"
+}
