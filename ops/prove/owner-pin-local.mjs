@@ -48,7 +48,7 @@ export function verifyOwnerPin({payload,signatureBase64,publicKeyPem,trustedKeyF
   const der=key.export({type:'spki',format:'der'});
   if(hash(der)!==trustedKeyFingerprint||payload.signerKeySha256!==trustedKeyFingerprint)return denied('KEY_PIN_MISMATCH');
   if(typeof signatureBase64!=='string'||!/^[-A-Za-z0-9+/]{86}==$/.test(signatureBase64))return denied('SIGNATURE_FORMAT_INVALID');
-  const sig=Buffer.from(signatureBase64,'base64');if(sig.length!==64)return denied('SIGNATURE_FORMAT_INVALID');
+  const sig=Buffer.from(signatureBase64,'base64');if(sig.length!==64||sig.toString('base64')!==signatureBase64)return denied('SIGNATURE_FORMAT_INVALID');
   const message=Buffer.concat([PREFIX,Buffer.from(canonical(payload),'utf8')]);
   if(!verifySignature(null,message,key,sig))return denied('SIGNATURE_INVALID');
   if(!keys(actual,['sourceRepository','sourceCommit','checkerSha256','manifestSha256','evidenceRepository','evidenceCommit','evidenceTreeSha'])||
