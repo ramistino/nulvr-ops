@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "nulvr.prove.local-review.v0",
+  "kind": "LOCAL_SOURCE_BOUND_RECHECK",
+  "reviewedCommit": "6d3178711dadf84d777be28b34f1c0d198a9bc56",
+  "runtime": "node-v22.16.0",
+  "tests": {
+    "total": 42,
+    "passed": 42,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 1443,
+    "logSha256": "c05fa369b631f49aef2af159049655e854df0a99fa126eaea5d55e72c4f3cce5"
+  },
+  "permissions": {
+    "ledgerWrite": false,
+    "releaseAuthority": false,
+    "autonomousDeployment": false
+  },
+  "trust": "SYNTHETIC_ONLY",
+  "remaining": [
+    "INDEPENDENT_OWNER_PIN_PROVENANCE",
+    "IMMUTABLE_STAGING_TOCTOU",
+    "SEPARATE_TRUSTED_VERDICT_LOCK",
+    "OPS_CI_STARTUP_FAILURE"
+  ]
+}
