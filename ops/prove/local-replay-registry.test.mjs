@@ -54,3 +54,20 @@ test('rejects symlinked ancestor even when root itself is a real directory',()=>
  try{assert.equal((await reserveReplayId({verificationId:id,registryRoot:join(link,'registry')})).reason,'REGISTRY_ROOT_NOT_CANONICAL')}
  finally{await rm(link,{force:true})}
 }));
+
+test('pre-existing reservation symlink cannot be followed or overwritten',()=>withRoot(async root=>{
+ const crypto=await import('node:crypto');
+ const name=crypto.createHash('sha256').update(id).digest('hex')+'.reserved';
+ const target=join(root,'target');
+ await import('node:fs/promises').then(fs=>fs.writeFile(target,'sentinel'));
+ await symlink(target,join(root,name));
+ const r=await reserveReplayId({verificationId:id,registryRoot:root});
+ assert.equal(r.reason,'REPLAY_DETECTED');
+ assert.equal(await readFile(target,'utf8'),'sentinel');
+}));
+test('reservation file is private',()=>withRoot(async root=>{
+ const fs=await import('node:fs/promises');
+ assert.equal((await reserveReplayId({verificationId:id,registryRoot:root})).status,'RESERVED_LOCAL_ONLY');
+ const [name]=await readdir(root); const meta=await fs.lstat(join(root,name));
+ assert.equal(meta.mode&0o777,0o600);
+}));
