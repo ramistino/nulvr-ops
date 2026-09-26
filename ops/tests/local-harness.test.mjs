@@ -60,7 +60,7 @@ test('no unpinned build SHA', async () => {
 
 // T2 local hardening negative cases: no remote target and no extra infrastructure.
 import {unlinkSync, renameSync, symlinkSync, chmodSync, readFileSync} from 'node:fs';
-import {classifyProbeError, summarizeLiveness} from '../load-tests/local-harness.mjs';
+import {classifyProbeError, summarizeLiveness, classifyTechnicalOutcome} from '../load-tests/local-harness.mjs';
 test('oversized config fails before full materialization or child spawn', async () => {
   const f = await fixture('responsive');
   try {
@@ -127,4 +127,41 @@ test('HTTP 503, timeout and transport errors each fail liveness and do not pollu
   assert.equal(liveness.failures,3);
   assert.equal(liveness.p95SuccessMs,10);
   assert.equal(liveness.livenessFailed,true);
+});
+
+test('work 503 is a failure even when /live stays healthy', async () => {
+ const f=await fixture('work503');
+ try {const r=await runLocal(f.configPath);
+ assert.equal(r.work.status,503); assert.equal(r.liveness.livenessFailed,false);
+ assert.equal(r.technicalOutcome.workSucceeded,false);
+ assert.ok(r.technicalOutcome.reasons.includes('WORK_HTTP_NON_200'));
+ assert.equal(r.technicalOutcome.operationalPass,false);}
+ finally {rmSync(f.dir,{recursive:true,force:true});}
+});
+test('work reset is a transport failure and never fabricated as HTTP 200', async () => {
+ const f=await fixture('workReset');
+ try {const r=await runLocal(f.configPath);
+ assert.equal(r.work.status,null); assert.equal(r.work.errorKind,'TRANSPORT_ERROR');
+ assert.ok(r.technicalOutcome.reasons.includes('WORK_TRANSPORT_ERROR'));}
+ finally {rmSync(f.dir,{recursive:true,force:true});}
+});
+test('invalid HTTP 200 body fails work contract', async () => {
+ const f=await fixture('workInvalidBody');
+ try {const r=await runLocal(f.configPath);
+ assert.equal(r.work.status,200);assert.equal(r.work.bodyValid,false);
+ assert.ok(r.technicalOutcome.reasons.includes('WORK_INVALID_BODY'));}
+ finally {rmSync(f.dir,{recursive:true,force:true});}
+});
+test('work timeout is bounded and cannot produce operational PASS', async () => {
+ const f=await fixture('workTimeout',{maxDurationMs:2500});
+ try {const r=await runLocal(f.configPath);
+ assert.equal(r.work.status,null);assert.equal(r.work.errorKind,'TIMEOUT');
+ assert.ok(r.technicalOutcome.reasons.includes('WORK_TIMEOUT'));
+ assert.equal(r.technicalOutcome.operationalPass,false);}
+ finally {rmSync(f.dir,{recursive:true,force:true});}
+});
+test('healthy work and liveness still cannot bypass unapproved provenance/resources',()=>{
+ const x=classifyTechnicalOutcome({status:200,bodyValid:true},{livenessFailed:false});
+ assert.equal(x.workSucceeded,true);assert.equal(x.operationalPass,false);
+ assert.equal(x.resourceBudgetExceeded,null);assert.equal(x.ownerPinVerified,false);
 });
