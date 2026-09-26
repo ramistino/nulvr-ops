@@ -62,7 +62,7 @@ function loadConfig(configPath) {
   let config;
   try { config = JSON.parse(raw); } catch { throw Error('CONFIG_JSON_INVALID'); }
   if (!exactKeys(config, ['schema', 'scenario', 'workMs', 'probeEveryMs', 'probeTimeoutMs', 'maxDurationMs', 'pinnedCommit', 'fixturePath', 'fixtureSha256']) ||
-      config.schema !== 'nulvr.load-local.v0' || !['responsive', 'blocked'].includes(config.scenario) ||
+      config.schema !== 'nulvr.load-local.v0' || !['responsive', 'blocked', 'work503', 'workReset', 'workTimeout', 'workInvalidBody'].includes(config.scenario) ||
       !Number.isInteger(config.workMs) || config.workMs < 200 || config.workMs > 1500 ||
       !Number.isInteger(config.probeEveryMs) || config.probeEveryMs < 25 || config.probeEveryMs > 250 ||
       !Number.isInteger(config.probeTimeoutMs) || config.probeTimeoutMs < 40 || config.probeTimeoutMs > 350 ||
@@ -91,6 +91,21 @@ export function summarizeLiveness(probes) {
     p50SuccessMs: percentile(successes, .5), p95SuccessMs: percentile(successes, .95),
     p99SuccessMs: percentile(successes, .99),
     livenessFailed: timeouts + transportErrors + httpNon200 > 0 };
+}
+export function classifyWorkResult(work) {
+  const workSucceeded = work?.status === 200 && work?.bodyValid === true;
+  const reasons = [];
+  if (!workSucceeded) reasons.push(work?.errorKind === 'TIMEOUT' ? 'WORK_TIMEOUT' :
+    work?.errorKind === 'TRANSPORT_ERROR' ? 'WORK_TRANSPORT_ERROR' :
+    work?.status !== 200 ? 'WORK_HTTP_NON_200' : 'WORK_INVALID_BODY');
+  return {workSucceeded, reasons};
+}
+export function classifyTechnicalOutcome(work, liveness) {
+  const outcome = classifyWorkResult(work);
+  if (liveness.livenessFailed) outcome.reasons.push('LIVENESS_FAILED');
+  return {...outcome, livenessFailed:liveness.livenessFailed,
+    resourceBudgetExceeded:null, ownerPinVerified:false, operationalPass:false,
+    reasons:[...outcome.reasons, 'RESOURCE_BUDGET_UNAPPROVED', 'OWNER_PIN_UNVERIFIED']};
 }
 export async function runLocal(configPath) {
   const {config, configSha256} = loadConfig(configPath);
@@ -123,10 +138,17 @@ export async function runLocal(configPath) {
     let workFinished = false;
     const work = (async () => {
       const started = performance.now();
-      const response = await fetch(base + '/work', {signal: AbortSignal.timeout(config.maxDurationMs - 400)});
-      await response.arrayBuffer();
-      workFinished = true;
-      return {status: response.status, latencyMs: +(performance.now() - started).toFixed(1)};
+      try {
+        const response = await fetch(base + '/work', {signal: AbortSignal.timeout(config.maxDurationMs - 400)});
+        const body = await response.arrayBuffer();
+        const bodyValid = response.status === 200 &&
+          Buffer.from(body).toString('utf8') === '{"status":"WORK_COMPLETE"}';
+        return {status:response.status, bodyValid,
+          latencyMs:+(performance.now()-started).toFixed(1)};
+      } catch (error) {
+        return {status:null, bodyValid:false, errorKind:classifyProbeError(error),
+          latencyMs:+(performance.now()-started).toFixed(1)};
+      } finally {workFinished=true;}
     })();
     const watchdog = (async () => {
       while (!workFinished && performance.now() - overall < config.maxDurationMs - 200) {
@@ -145,8 +167,11 @@ export async function runLocal(configPath) {
     })();
     const result = await deadline(work, config.maxDurationMs - 200, 'WORK_TIMEOUT');
     await deadline(watchdog, 1000, 'WATCHDOG_TIMEOUT');
-    const metrics = await deadline(metricsPromise, 600, 'CHILD_METRICS_MISSING');
+    const metrics = result.errorKind === 'TIMEOUT' ?
+      {eventLoopMaxDelayMs:null,rssBytes:null,peakRssKb:null,cpuMicros:null} :
+      await deadline(metricsPromise, 600, 'CHILD_METRICS_MISSING');
     const liveness = summarizeLiveness(probes);
+    const technicalOutcome = classifyTechnicalOutcome(result,liveness);
     const summary = {
       schema: 'nulvr.load-local-result.v0', status: 'OBSERVED', authority: 'SYNTHETIC_ONLY',
       pinnedCommit: config.pinnedCommit, configSha256, fixtureSha256: config.fixtureSha256,
@@ -154,7 +179,7 @@ export async function runLocal(configPath) {
       scenario: config.scenario,
       workload: {workMs: config.workMs, probeEveryMs: config.probeEveryMs, probeTimeoutMs: config.probeTimeoutMs},
       work: result,
-      liveness, fixtureUsedAsWorkload: false,
+      liveness, technicalOutcome, fixtureUsedAsWorkload: false,
       resources: {childEventLoopMaxDelayMs: metrics.eventLoopMaxDelayMs,
         childRssBytesAfterWork: metrics.rssBytes, childPeakRssKb: metrics.peakRssKb,
         childWorkCpuMicros: metrics.cpuMicros},
