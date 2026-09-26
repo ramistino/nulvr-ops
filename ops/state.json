@@ -77,38 +77,39 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "EXACT_SOURCE_TEST_AND_12_RUN_PROFILE_COMPLETE_OPERATIONAL_BLOCKED",
-          "note": "Fresh source-bound PROVE-style technical rerun on Node v22.16.0: Git blob hashes match GitHub 3a902ff/da8e47f/1f81374; 18/18 passed, 0 failed/skipped, log SHA256 e26c1a041f383a81de5aaf85a98d9ebfa347cd2f254d191c268526e0b2ae4ef8. Static GUARD review: child binds 127.0.0.1, fetches only constructed loopback base, no writes, verdict flags false, SIGTERM/SIGKILL fallback. This is same assistant/session, NOT independent organizational PROVE/GUARD signoff. OS RSS/CPU quotas, protected owner pin, immutable staging, workload budgets and external review remain pending. No CI/merge/deploy/spend.",
+          "status": "TIMEOUT_TELEMETRY_PATCH_STAGED_18_OF_18_TWICE_OPERATIONAL_BLOCKED",
+          "note": "Branch-only C4 timeout telemetry patch adds 100ms periodic IPC resource samples, preserves last sample on synthetic work timeout, explicitly distinguishes sampled values from final workComplete metrics. Exact local patch blobs match GitHub: harness 450ebeb5, target 75cd8361, tests 15b1897a; Node v22.16.0 two complete local runs 18/18 each, zero failures/skips. This is same-session BUILD evidence, not independent PROVE/GUARD signoff. Periodic samples are not OS RSS/CPU limits, may be absent if event loop stalls or child dies; no production authority. No CI/merge/deploy/spend.",
           "local_tests": {
             "tests": 18,
             "passed": 18,
             "failed": 0,
             "skipped": 0,
             "build_repetitions": 2,
-            "technical_rerun_repetitions": 1,
+            "technical_rerun_repetitions": 0,
             "runtime": "node-v22.16.0",
-            "harness_blob": "3a902ff1735b9fb602b305ec37f1148d6d05ac09",
-            "target_blob": "da8e47f1cfd776afa629a50ecfc05f83a44bf6cd",
-            "test_blob": "1f81374c7349195f7479e4b0ea2d1ae162a5a79a",
-            "technical_rerun_log_sha256": "e26c1a041f383a81de5aaf85a98d9ebfa347cd2f254d191c268526e0b2ae4ef8",
-            "trust_level": "OFFLINE_SYNTHETIC_TECHNICAL_ONLY",
+            "harness_blob": "450ebeb5d99473ae9f60f3ae6ee30643e09f1af7",
+            "target_blob": "75cd8361d7d7ffc1b961a9107d94c9a7b2ac41aa",
+            "test_blob": "15b1897a84f99eb309e001142efd43f125d9706d",
+            "local_test_log_sha256": [
+              "6f527d39738a204d9260460cff1bd6972204c55ec3bbe4fc2b683749c6a0b6bd",
+              "deb57249ab2e9483432e163d02c202fa9b1c884de8a15c16d618428c788dc65d"
+            ],
+            "trust_level": "OFFLINE_SYNTHETIC_BUILD_ONLY",
             "independent_reviewer_signoff": false
           },
           "pending_verification": {
             "github_blobs": {
-              "harness": "3a902ff1735b9fb602b305ec37f1148d6d05ac09",
-              "target": "da8e47f1cfd776afa629a50ecfc05f83a44bf6cd",
-              "tests": "1f81374c7349195f7479e4b0ea2d1ae162a5a79a"
+              "harness": "450ebeb5d99473ae9f60f3ae6ee30643e09f1af7",
+              "target": "75cd8361d7d7ffc1b961a9107d94c9a7b2ac41aa",
+              "tests": "15b1897a84f99eb309e001142efd43f125d9706d"
             },
             "node": "v22.16.0",
             "fresh_technical_rerun": {
-              "passed": 18,
-              "failed": 0,
-              "skipped": 0,
-              "log_sha256": "e26c1a041f383a81de5aaf85a98d9ebfa347cd2f254d191c268526e0b2ae4ef8"
+              "status": "PENDING_NEW_PATCH"
             },
             "guard_static_review": "NO_REMOTE_TARGET_OR_LEDGER_WRITE_IN_C4_SOURCE",
             "remaining": [
+              "fresh source-bound technical rerun for telemetry patch",
               "independent reviewer signoff",
               "protected owner pin",
               "immutable staging",
@@ -170,7 +171,7 @@
             "report_commit": "421bd0072067e2a26c17ae3ac2e0d7cd5101d4c8",
             "local_raw_json_sha256": "90bfc7591e687c4534af3930fa7d2ce13f31683e724a83aba0ad088f5efdafe0",
             "observation": "Late 200 under blocked CPU had 3 watchdog failures per run; work503/reset/timeout/invalid-body fail work independently; no operational PASS",
-            "limitation": "Two synthetic runs per scenario only; timeout child resource metrics missing; no OS quotas or approved workload budgets; raw JSON remains local"
+            "limitation": "Two synthetic runs per scenario only; timeout child resource metrics missing; no OS quotas or approved workload budgets; raw JSON remains local; historical profile predates timeout telemetry patch, do not treat as current-patch measurements"
           }
         },
         {
