@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash,generateKeyPairSync,sign} from 'node:crypto';
 import {canonical,domainPrefix} from './owner-pin-local.mjs';
-import {verifyOfflineOwnerPin} from './offline-owner-pin-integration.mjs';
+import {verifyOfflineOwnerPin,verifySyntheticOwnerPinFixture} from './offline-owner-pin-integration.mjs';
 const h=b=>createHash('sha256').update(b).digest('hex');
 const {publicKey,privateKey}=generateKeyPairSync('ed25519'); // ephemeral synthetic key, not founder key
 const publicKeyPem=publicKey.export({type:'spki',format:'pem'});
@@ -15,17 +15,17 @@ const raw=JSON.stringify(actual);
 const anchor={origin:'INDEPENDENT_OFFLINE_READONLY',keySha256,snapshotSha256:h(raw)};
 const snapshot={raw,verifiedSource:'INDEPENDENT_OFFLINE_READONLY'};
 const args={rawPayloadJson,payload,signatureBase64,publicKeyPem,anchor,snapshot,actual,seenIds:[],now:new Date('2026-09-26T12:00:00Z')};
-test('integrated signed synthetic fixture is OBSERVED only',()=>{const r=verifyOfflineOwnerPin(args);assert.equal(r.status,'OBSERVED');assert.equal(r.ledgerWrite,false);assert.equal(r.atomicReplayEnforced,false)});
-test('forged signature is rejected by integrated verifier',()=>assert.equal(verifyOfflineOwnerPin({...args,signatureBase64:'A'+signatureBase64.slice(1)}).status,'UNVERIFIABLE'));
-test('wrong independently supplied key pin is rejected',()=>assert.equal(verifyOfflineOwnerPin({...args,anchor:{...anchor,keySha256:'0'.repeat(64)}}).status,'UNVERIFIABLE'));
-test('tampered snapshot is rejected',()=>assert.equal(verifyOfflineOwnerPin({...args,snapshot:{...snapshot,raw:'tampered'}}).reason,'SNAPSHOT_ANCHOR_MISMATCH'));
-test('duplicate raw key is rejected before signature',()=>assert.equal(verifyOfflineOwnerPin({...args,rawPayloadJson:rawPayloadJson.replace('"approvedScope":"SYNTHETIC_OFFLINE_ONLY"','"approvedScope":"PRODUCTION","approvedScope":"SYNTHETIC_OFFLINE_ONLY"')}).reason,'DUPLICATE_JSON_KEY'));
-test('replayed verificationId is rejected',()=>assert.equal(verifyOfflineOwnerPin({...args,seenIds:[payload.verificationId]}).reason,'REPLAY_DETECTED'));
-test('untrusted anchor label is rejected',()=>assert.equal(verifyOfflineOwnerPin({...args,anchor:{...anchor,origin:'WORKTREE'}}).reason,'PROTECTED_ANCHOR_REQUIRED'));
-test('no caller supplied verification status is accepted',()=>{const r=verifyOfflineOwnerPin({...args,signatureBase64:'invalid',verification:{status:'OBSERVED',signatureValid:true,snapshotMatches:true}});assert.equal(r.status,'UNVERIFIABLE')});
+test('integrated signed synthetic fixture is OBSERVED only',()=>{const r=verifySyntheticOwnerPinFixture(args);assert.equal(r.status,'OBSERVED');assert.equal(r.ledgerWrite,false);assert.equal(r.atomicReplayEnforced,false)});
+test('forged signature is rejected by integrated verifier',()=>assert.equal(verifySyntheticOwnerPinFixture({...args,signatureBase64:'A'+signatureBase64.slice(1)}).status,'UNVERIFIABLE'));
+test('wrong independently supplied key pin is rejected',()=>assert.equal(verifySyntheticOwnerPinFixture({...args,anchor:{...anchor,keySha256:'0'.repeat(64)}}).status,'UNVERIFIABLE'));
+test('tampered snapshot is rejected',()=>assert.equal(verifySyntheticOwnerPinFixture({...args,snapshot:{...snapshot,raw:'tampered'}}).reason,'SNAPSHOT_ANCHOR_MISMATCH'));
+test('duplicate raw key is rejected before signature',()=>assert.equal(verifySyntheticOwnerPinFixture({...args,rawPayloadJson:rawPayloadJson.replace('"approvedScope":"SYNTHETIC_OFFLINE_ONLY"','"approvedScope":"PRODUCTION","approvedScope":"SYNTHETIC_OFFLINE_ONLY"')}).reason,'DUPLICATE_JSON_KEY'));
+test('replayed verificationId is rejected',()=>assert.equal(verifySyntheticOwnerPinFixture({...args,seenIds:[payload.verificationId]}).reason,'REPLAY_DETECTED'));
+test('untrusted anchor label is rejected',()=>assert.equal(verifySyntheticOwnerPinFixture({...args,anchor:{...anchor,origin:'WORKTREE'}}).reason,'PROTECTED_ANCHOR_REQUIRED'));
+test('no caller supplied verification status is accepted',()=>{const r=verifySyntheticOwnerPinFixture({...args,signatureBase64:'invalid',verification:{status:'OBSERVED',signatureValid:true,snapshotMatches:true}});assert.equal(r.status,'UNVERIFIABLE')});
 
-test('caller-supplied actual cannot disagree with anchored snapshot',()=>assert.equal(verifyOfflineOwnerPin({...args,actual:{...actual,sourceCommit:'0'.repeat(40)}}).reason,'SNAPSHOT_ACTUAL_MISMATCH'));
-test('duplicate keys inside snapshot are rejected',()=>{const forged='{"sourceCommit":"0",'+raw.slice(1);const result=verifyOfflineOwnerPin({...args,snapshot:{...snapshot,raw:forged},anchor:{...anchor,snapshotSha256:h(forged)}});assert.equal(result.status,'UNVERIFIABLE')});
+test('caller-supplied actual cannot disagree with anchored snapshot',()=>assert.equal(verifySyntheticOwnerPinFixture({...args,actual:{...actual,sourceCommit:'0'.repeat(40)}}).reason,'SNAPSHOT_ACTUAL_MISMATCH'));
+test('duplicate keys inside snapshot are rejected',()=>{const forged='{"sourceCommit":"0",'+raw.slice(1);const result=verifySyntheticOwnerPinFixture({...args,snapshot:{...snapshot,raw:forged},anchor:{...anchor,snapshotSha256:h(forged)}});assert.equal(result.status,'UNVERIFIABLE')});
 
 test('integration fails closed without authenticated trust source',()=>{
  const r=verifyOfflineOwnerPin(args);
@@ -36,4 +36,13 @@ test('caller-crafted trust receipt cannot unlock integration',()=>{
  const r=verifyOfflineOwnerPin({...args,trustSourceReceipt:{trustSourceAuthenticated:true}});
  assert.equal(r.status,'UNVERIFIABLE');
  assert.equal(r.reason,'AUTHENTICATED_TRUST_SOURCE_NOT_IMPLEMENTED');
+});
+
+test('synthetic result cannot authenticate operational verifier',()=>{
+ const synthetic=verifySyntheticOwnerPinFixture(args);
+ assert.equal(synthetic.syntheticOnly,true);
+ assert.equal(synthetic.ledgerWrite,false);
+ assert.equal(synthetic.releaseAuthority,false);
+ const operational=verifyOfflineOwnerPin({...args,trustSourceReceipt:synthetic});
+ assert.equal(operational.status,'UNVERIFIABLE');
 });
