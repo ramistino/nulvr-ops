@@ -46,7 +46,7 @@
             "assertions_blob": "ecd2f3144c6da348081ef87904b751a98d70f3cb",
             "assertion_tests_blob": "ca76b8f558f932539ec4e39540fafd92362ba11f",
             "provenance": "EXACT_GIT_BLOB_LOCAL_TEST_EXECUTION",
-            "trust_level": "SYNTHETIC_ONLY_PENDING_INDEPENDENT_PROVE"
+            "trust_level": "SYNTHETIC_ONLY_INDEPENDENT_TECHNICAL_PROVE_PASS_TRUSTED_ACTIVATION_PENDING"
           }
         },
         {
