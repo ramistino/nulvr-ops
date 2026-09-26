@@ -63,3 +63,16 @@ test('operational verifier rejects caller-crafted provenance even with valid syn
  assert.equal(r.ledgerWrite,false);
  assert.equal(r.releaseAuthority,false);
 });
+
+test('throwing trust getter cannot escape operational boundary',()=>{
+ const r=verifyOfflineOwnerPin({get trustSourceReceipt(){throw new Error('hostile getter')}});
+ assert.equal(r.status,'UNVERIFIABLE');
+ assert.equal(r.reason,'INTEGRATION_INPUT_ERROR');
+ assert.equal(r.ledgerWrite,false);
+ assert.equal(r.releaseAuthority,false);
+});
+test('hostile Proxy cannot escape operational boundary',()=>{
+ const r=verifyOfflineOwnerPin(new Proxy({}, {get(){throw new Error('hostile proxy')}}));
+ assert.equal(r.status,'UNVERIFIABLE');
+ assert.equal(r.reason,'INTEGRATION_INPUT_ERROR');
+});
