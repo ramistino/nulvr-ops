@@ -79,3 +79,9 @@ test('caller object cannot substitute snapshot identity after signed raw JSON eq
  assert.equal(result.status,'OBSERVED');
  assert.equal(reads,1);
 });
+
+test('unsafe integers are rejected instead of signing rounded JSON numbers',()=>{
+ assert.throws(()=>canonical(Number.MAX_SAFE_INTEGER+1),/INVALID_NUMBER/);
+ assert.throws(()=>canonical(-(Number.MAX_SAFE_INTEGER+1)),/INVALID_NUMBER/);
+ assert.equal(canonical(Number.MAX_SAFE_INTEGER),String(Number.MAX_SAFE_INTEGER));
+});
