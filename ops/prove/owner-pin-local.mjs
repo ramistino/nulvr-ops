@@ -17,7 +17,7 @@ export function canonical(value,seen=new Set()){
  if(value===null)return 'null';
  if(typeof value==='string'){validString(value);return JSON.stringify(value)}
  if(typeof value==='boolean')return value?'true':'false';
- if(typeof value==='number'){if(!Number.isFinite(value)||Number.isInteger(value)&&!Number.isSafeInteger(value))invalid('INVALID_NUMBER');return JSON.stringify(value)}
+ if(typeof value==='number'){if(!Number.isFinite(value))invalid('INVALID_NUMBER');return JSON.stringify(value)}
  if(typeof value!=='object'||seen.has(value))invalid('NON_JSON_OR_CYCLE');
  seen.add(value);let result;
  if(Array.isArray(value)){if(Object.keys(value).filter(k=>/^(0|[1-9][0-9]*)$/.test(k)).length!==value.length)invalid('SPARSE_ARRAY');result='['+Array.from(value,v=>canonical(v,seen)).join(',')+']';}
