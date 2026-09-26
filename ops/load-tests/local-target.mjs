@@ -13,6 +13,14 @@ process.once('message', (config) => {
     process.exitCode = 1;
     return;
   }
+  // Periodic telemetry survives a synthetic /work timeout; it is observational, not an OS quota.
+  const telemetry = setInterval(() => {
+    const cpu = process.cpuUsage();
+    process.send?.({type: 'resourceSample', sampledAtMs: performance.now(),
+      rssBytes: process.memoryUsage().rss, peakRssKb: process.resourceUsage().maxRSS,
+      cpuMicros: cpu.user + cpu.system, eventLoopMaxDelayMs: +(histogram.max / 1e6).toFixed(1)});
+  }, 100);
+  telemetry.unref();
   server = http.createServer((req, res) => {
     res.setHeader('cache-control', 'no-store');
     if (req.method === 'GET' && req.url === '/live') {
