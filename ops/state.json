@@ -34,16 +34,18 @@
           "title": "Trusted PROVE checker on synthetic fixtures",
           "tier": "T2",
           "lane": "PROVE",
-          "status": "V0_2A_ARCHITECTURE_LOCK_GO_IMPLEMENTATION_ACTIVE",
-          "note": "Founder GO recorded for bounded offline synthetic v0.2a only. No regex, trusted VERIFIED writer, CI, production, merge, deploy, spending or Orchestrator authority.",
+          "status": "V0_2A_OFFLINE_IMPLEMENTED_LOCAL_PASS_AWAIT_PROVE",
+          "note": "Founder-approved offline synthetic v0.2a Layer A+Layer B staged. Locally re-ran 42/42 including C4; exact implementation/test blobs pinned in implementation note. No independently trusted VERIFIED writer or production access.",
           "local_tests": {
-            "count": 12,
-            "passed": 12,
+            "count": 42,
+            "passed": 42,
             "failed": 0,
             "runtime": "node-v22.16.0",
-            "checker_blob": "ca35376cde818b12588af64ebe614a9c3cc01a1b",
-            "test_blob": "2cb5fd5fe6aa8f68e667b5c63ee2f0fc0d4eabfb",
-            "trust_level": "SYNTHETIC_ONLY_NO_VERIFIED_WRITE"
+            "checker_blob": "272e38e40dd5b33446a33cd37c4143b73d78be18",
+            "assertions_blob": "ecd2f3144c6da348081ef87904b751a98d70f3cb",
+            "assertion_tests_blob": "ca76b8f558f932539ec4e39540fafd92362ba11f",
+            "provenance": "EXACT_GIT_BLOB_LOCAL_TEST_EXECUTION",
+            "trust_level": "SYNTHETIC_ONLY_PENDING_INDEPENDENT_PROVE"
           }
         },
         {

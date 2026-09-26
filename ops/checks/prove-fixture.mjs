@@ -1,8 +1,9 @@
 // C3 synthetic-only PROVE candidate. This NEVER emits VERIFIED or writes to the protected ledger.
 // The manifest digest and expected Git SHA MUST arrive from an independent, pre-approved channel.
 import {createHash, timingSafeEqual} from 'node:crypto';
-import {openSync, readFileSync, closeSync, fstatSync, lstatSync, realpathSync, readdirSync, constants} from 'node:fs';
+import {openSync, readSync, closeSync, fstatSync, lstatSync, realpathSync, readdirSync, constants} from 'node:fs';
 import {join, relative, isAbsolute, sep} from 'node:path';
+import {validateAssertions, evaluateAssertions} from './assertions-v02a.mjs';
 
 const MAX_MANIFEST = 65536;
 const MAX_EVIDENCE = 1048576;
@@ -32,7 +33,16 @@ function readBounded(path, limit) {
     descriptor = openSync(path, constants.O_RDONLY | (constants.O_NOFOLLOW || 0));
     const before = fstatSync(descriptor);
     if (!before.isFile() || before.size > limit) fail('FILE_TOO_LARGE_OR_INVALID');
-    const bytes = readFileSync(descriptor);
+    // Bound the bytes actually read, even if a file grows after the first stat.
+    const buffer = Buffer.alloc(limit + 1);
+    let n = 0;
+    while (n < buffer.length) {
+      const count = readSync(descriptor, buffer, n, buffer.length - n, null);
+      if (!count) break;
+      n += count;
+    }
+    if (n > limit) fail('FILE_TOO_LARGE_OR_INVALID');
+    const bytes = buffer.subarray(0, n);
     const after = fstatSync(descriptor);
     if (before.size !== after.size || before.mtimeMs !== after.mtimeMs || bytes.length !== before.size) fail('FILE_CHANGED_DURING_READ');
     return bytes;
@@ -45,8 +55,11 @@ function readBounded(path, limit) {
   }
 }
 function validate(manifest) {
-  if (!object(manifest, ['schemaVersion', 'subject', 'pinnedCommit', 'entries'])
-    || manifest.schemaVersion !== 'nulvr.prove.synthetic-manifest.v0'
+  const v02a = manifest?.schemaVersion === 'nulvr.prove.synthetic-manifest.v0.2a';
+  if (!object(manifest, v02a
+    ? ['schemaVersion', 'subject', 'pinnedCommit', 'entries', 'assertions', 'all']
+    : ['schemaVersion', 'subject', 'pinnedCommit', 'entries'])
+    || (!v02a && manifest.schemaVersion !== 'nulvr.prove.synthetic-manifest.v0')
     || typeof manifest.subject !== 'string' || !/^[A-Za-z0-9._:/-]{1,128}$/.test(manifest.subject)
     || typeof manifest.pinnedCommit !== 'string' || !COMMIT.test(manifest.pinnedCommit)
     || !Array.isArray(manifest.entries) || manifest.entries.length < 1 || manifest.entries.length > MAX_ENTRIES) {
@@ -65,6 +78,7 @@ function validate(manifest) {
     total += item.size;
     if (total > MAX_EVIDENCE) fail('MANIFEST_TOTAL_SIZE_LIMIT');
   }
+  if (v02a) validateAssertions(manifest);
 }
 // Closed evidence bundle: manifest describes every regular file in the root.
 // If the manifest itself lives under root, exclude only that exact canonical file.
@@ -117,6 +131,7 @@ function check(manifestPath, root, pinnedManifestSha, expectedCommit) {
   // Avoid accepting a correct declared subset accompanied by undeclared data.
   verifyClosedBundle(realRoot, manifestPath, new Set(manifest.entries.map(item => item.path)));
   let checked = 0;
+  const evidenceBytes = manifest.schemaVersion === 'nulvr.prove.synthetic-manifest.v0.2a' ? new Map() : null;
   for (const item of manifest.entries) {
     const candidate = join(realRoot, ...item.path.split('/'));
     let actual;
@@ -134,15 +149,19 @@ function check(manifestPath, root, pinnedManifestSha, expectedCommit) {
       try { JSON.parse(content.toString('utf8')); }
       catch { fail('EVIDENCE_JSON_INVALID'); }
     }
+    if (evidenceBytes) evidenceBytes.set(item.path, content);
     checked += 1;
   }
-  // Matching untrusted local fixtures is only an observation, NOT trusted attestation.
-  return {status: 'OBSERVED', subject: manifest.subject, checked, manifestSha256: digest(raw),
+  // A matching synthetic bundle is OBSERVED; v0.2a additionally evaluates *pre-pinned*
+  // assertions. Neither path is a protected attestation or a release decision.
+  const assertionResult = evidenceBytes ? evaluateAssertions(manifest, evidenceBytes) : {status: 'OBSERVED'};
+  return {...assertionResult, subject: manifest.subject, checked, manifestSha256: digest(raw),
     pinnedCommit: expectedCommit, ledgerWrite: false, releaseAuthority: false};
 }
 try {
   const result = check(process.argv[2], process.argv[3], process.argv[4], process.argv[5]);
   console.log(JSON.stringify(result));
+  if (result.status === 'ASSERTION_FAIL') process.exitCode = 3;
 } catch (error) {
   console.log(JSON.stringify({status: error.status || 'CHECK_ERROR', reason: error.status ? error.message : 'UNHANDLED_CHECK_ERROR',
     ledgerWrite: false, releaseAuthority: false}));
