@@ -40,7 +40,8 @@ export async function reserveReplayId({verificationId,registryRoot}={}){
   await fd.close();fd=undefined;
   // Re-check the path after the exclusive create. This narrows replacement races but does not
   // claim full adversarial TOCTOU safety; production requires directory-fd/openat semantics.
-  if(await realpath(root)!==root)return deny('REGISTRY_ROOT_CHANGED');
+  const after=await lstat(root);
+  if(!after.isDirectory()||after.isSymbolicLink()||after.dev!==meta.dev||after.ino!==meta.ino||after.uid!==meta.uid||(after.mode&0o077)!==0||await realpath(root)!==root)return deny('REGISTRY_ROOT_CHANGED');
   const dir=await open(root,'r');
   try{await dir.sync()}finally{await dir.close()}
   return {status:'RESERVED_LOCAL_ONLY',replayReserved:true,atomicOnLocalFilesystem:true,ledgerWrite:false,releaseAuthority:false};
