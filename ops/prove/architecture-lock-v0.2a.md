@@ -1,6 +1,6 @@
 # C3 Architecture Lock v0.2a — bounded synthetic proposal
 
-**Gate:** founder GO pending. This is an offline company capability independent of ALPS 4.18. It does not authorize a protected VERIFIED writer, autonomous PROVE agent, production access, CI run, deployment, purchase or merge.
+**Gate:** founder GO recorded 2026-09-26 for the narrowly scoped offline/synthetic implementation only, following explicit user instruction to execute. Independent PROVE implementation acceptance remains pending. This is an offline company capability independent of ALPS 4.18. It does not authorize a protected VERIFIED writer, autonomous PROVE agent, production access, CI run, deployment, purchase or merge.
 
 This proposal incorporates the [independent source review](https://github.com/ramistino/nulvr-ops/blob/c79dad087ad5d38f125c197c18e87a1507fb0424/ops/prove/reviews/2026-09-26-c3-v02.md) of [v0.2](./architecture-lock-v0.2.md).
 
@@ -29,4 +29,4 @@ Output: ASSERTION_PASS, ASSERTION_FAIL, UNVERIFIABLE or CHECK_ERROR, always with
 
 BUILD supplies exact source SHA, deterministic positive/negative synthetic fixtures and local reproducible tests. PROVE independently re-fetches the committed source, checks identities, reruns the tests and reviews both assertion semantics and the remaining filesystem race boundary. GUARD confirms no outbound network, protected ledger write, deployment, spending or permission expansion. The founder's **T2 GO covers only this offline synthetic candidate**; trusted write-path activation needs a separate approval.
 
-**Decision remains PENDING.** Do not activate the assertion layer or any protected writer by virtue of this document.
+**Decision: GO — offline synthetic v0.2a implementation ONLY.** A matching local test run does not grant protected-verdict authority. Independent PROVE source-bound acceptance is pending. No CI, main merge, ALPS/Render production action, paid resource, protected writer or Orchestrator activation.

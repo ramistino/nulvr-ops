@@ -34,16 +34,20 @@
           "title": "Trusted PROVE checker on synthetic fixtures",
           "tier": "T2",
           "lane": "PROVE",
-          "status": "V0_2A_DESIGN_AWAIT_FOUNDER_GO",
-          "note": "Bounded no-regex synthetic v0.2a proposal staged, plus separate branch-only closed-bundle v0.1.1 hardening candidate (local 22/22); awaiting independent review and founder T2 GO. No trusted VERIFIED writer.",
+          "status": "OFFLINE_V02A_IMPL_STAGED_AWAIT_INDEPENDENT_PROVE",
+          "note": "Founder GO limited to offline synthetic v0.2a implementation on 2026-09-26. Closed Layer A plus deterministic pre-pinned Layer B implemented; local source-bound 42/42 tests pass on Node v22.16.0. Independent PROVE and protected writer approval remain separate gates.",
           "local_tests": {
-            "count": 12,
-            "passed": 12,
+            "count": 42,
+            "passed": 42,
             "failed": 0,
             "runtime": "node-v22.16.0",
-            "checker_blob": "ca35376cde818b12588af64ebe614a9c3cc01a1b",
-            "test_blob": "2cb5fd5fe6aa8f68e667b5c63ee2f0fc0d4eabfb",
-            "trust_level": "SYNTHETIC_ONLY_NO_VERIFIED_WRITE"
+            "checker_blob": "272e38e40dd5b33446a33cd37c4143b73d78be18",
+            "assertions_blob": "ecd2f3144c6da348081ef87904b751a98d70f3cb",
+            "assertion_tests_blob": "ca76b8f558f932539ec4e39540fafd92362ba11f",
+            "legacy_tests_blob": "2898affe3ef7058607b3e1c5591fdf4d6a28c1fc",
+            "c4_test_blob": "20e4c28b1c8c3932f2af70140ef1636b44d3baaf",
+            "trust_level": "SYNTHETIC_ONLY_NO_PROTECTED_VERIFIED_WRITE",
+            "test_log_sha256": "456452118cc761a766e528b8f1a08a13f40fad15bbbb4035c9d335a655a23356"
           }
         },
         {
