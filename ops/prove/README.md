@@ -1,29 +1,33 @@
-# C3 — Offline PROVE checker: synthetic fixture PoC
+# C3 — Offline PROVE checker: synthetic v0.2a
 
-**Scope:** company-side prototype only. ALPS Phase 4.18 is not a dependency. This is not the approved trusted checker and cannot emit a protected-ledger `VERIFIED` verdict.
+**Current status:** independently source-bound technical PROVE PASS in the offline/synthetic scope (**42/42** across the recorded combined suite, including five C4 local-watchdog tests). **Trusted activation remains BLOCKED.** ALPS Phase 4.18 is not a prerequisite for company-side synthetic development. No protected-ledger `VERIFIED` verdict, production authority, network access or deployment is granted.
 
-## Design contract
+## Current Layer A + B behavior
 
-1. The owner / separate acceptance system fixes an expected **40-hex commit SHA** and **SHA-256 digest of the manifest bytes** before the verifier reads the manifest. The two pins must arrive from an independent approved channel; supplying both from the same mutable worktree is not trusted verification.
-2. The manifest binds the subject, pinned commit, and a bounded set of staged local evidence files to exact raw-byte SHA-256 hashes and sizes. The checker reopens files directly, not BUILD's narrative or reported test success.
-3. On matching inputs, the checker emits **OBSERVED** (not VERIFIED), with manifest digest, checked count, and commit claim. Missing evidence and absent independent pins give **UNVERIFIABLE**; inconsistent data, tampering, malformed schema, symlinks, traversal and invalid JSON give **CHECK_ERROR**.
-4. It never writes to `checks/ledger.mjs`, never touches the protected anchor, and contains no GitHub/Render network access, deployment, merge or spending capability.
+- **Layer A:** pre-pinned 40-hex source commit and raw manifest SHA-256; closed evidence bundle; bounded descriptor-based reads; reject undeclared files, symlinks, path escapes, invalid JSON and byte/size mismatches. A CLI-supplied pin is not proof of independent owner approval.
+- **Layer B (v0.2a only):** bounded `json_pointer_equals` and `sha256_equals` assertions with a flat `all` of up to 32 unique assertions; no regex, dynamic operators or nested logic. False propositions yield `ASSERTION_FAIL` with nonzero exit. A valid synthetic proposition yields `ASSERTION_PASS`, **not** protected `VERIFIED`.
+- The older v0 manifest path may yield `OBSERVED`; `UNVERIFIABLE` and `CHECK_ERROR` remain fail-closed error outcomes. Neither `OBSERVED` nor an assertion result is a release authorization.
 
-## Local synthetic testing
+## Offline usage
 
 ```bash
-node --test ops/tests/prove-fixture.test.mjs
+node --test ops/tests/prove-fixture.test.mjs ops/tests/assertions-v02a.test.mjs
 node ops/checks/prove-fixture.mjs <manifest.json> <staged-root-dir> <preapproved-manifest-sha256> <preapproved-commit-sha>
 ```
 
-Only explicitly staged, unprivileged local synthetic fixtures are appropriate. Limits: 64 KiB manifest, 16 evidence entries, 1 MiB cumulative evidence, exact bounded size per entry, regular files only, no symlinks, no path traversal. A mutable staging directory is **not** an adversarial filesystem isolation boundary; stronger openat/root isolation is required before trusted production use.
+Only use unprivileged synthetic fixtures and independently pre-approved pins. Limits: 64 KiB manifest, 16 evidence entries, 1 MiB cumulative evidence, exact bounded size per entry, regular files only. The command does not itself establish approval provenance.
 
-## Independent PROVE acceptance gates before C3 is considered complete
+## Evidence already reviewed
 
-- Re-run tests **from the committed head** using an independent verification session. Observe that the committed checker never emits VERIFIED and cannot modify ledger or external infrastructure.
-- Attack the acceptance manifest and evidence separately; require rejection of altered hashes, missing objects, invalid JSON, unpinned inputs, wrong pinned commit, and path escapes.
-- Review filesystem race conditions and bound actual bytes read (not only the pre-read stat). Verify the source identity of every fetched piece of production evidence, not only a local manifest assertion.
-- Obtain T2 Architecture Lock for the trusted PROVE write path and an independently protected anchor; reject self-approval of both checker and the evidence being inspected.
-- **ALPS-based qualification is a later gate**. It does not block this synthetic company capability.
+- Exact BUILD implementation: [`6d31787`](https://github.com/ramistino/nulvr-ops/commit/6d3178711dadf84d777be28b34f1c0d198a9bc56).
+- Independent source-bound technical PROVE: [`2169ecc`](https://github.com/ramistino/nulvr-ops/commit/2169ecce4b8156eebd4eaa7cdcff2e3bbb8eb82b), seven exact source blobs and **42/42** passing combined offline tests on Node v22.16.0. This count includes five C4 local-watchdog tests and must not be described as 42 C3-only tests.
+- Unsigned [owner-pin v0.1a design](./owner-pin-design-v0.1a.md) and [schema](./owner-pin-design-v0.1a.schema.json): independently reviewed **19/19 structural cases**. Format validation is not cryptographic attestation.
 
-**Current result:** prototype code and tests staged on company branch; no CI workflow change or PR created while the existing zero-job startup failure is unresolved.
+## Remaining trust and activation gates
+
+1. Founder-approved independent key custody, public-key pin, canonical signed owner record, protected owner-only publication, immutable private evidence retrieval, expiry/replay policy and separate T2 implementation GO.
+2. Harden ancestor-directory TOCTOU and hostile-filesystem isolation. The mutable synthetic staging root is not a trusted atomic snapshot.
+3. Separate Architecture Lock for any protected verdict writer. Neither `ASSERTION_PASS` nor a signed owner pin alone can write `VERIFIED`.
+4. Diagnose PR #7 pre-job `startup_failure` and cost controls before any GitHub Actions/PR trigger. ALPS-based qualification is a later PRODUCT-linked gate, not a blocker for synthetic company development.
+
+**No CI, main merge, deployment, paid service, ALPS production probe or Orchestrator activation is authorized by this document.**
