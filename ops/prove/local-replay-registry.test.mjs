@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,chmod,rm,readdir,readFile} from 'node:fs/promises';
+import {mkdtemp,chmod,rm,readdir,readFile,symlink} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {reserveReplayId} from './local-replay-registry.mjs';
@@ -14,3 +14,15 @@ test('missing externally provisioned root fails closed',async()=>assert.equal((a
 test('relative root is rejected',async()=>assert.equal((await reserveReplayId({verificationId:id,registryRoot:'./registry'})).reason,'EXTERNAL_REGISTRY_ROOT_REQUIRED'));
 test('invalid verification ID is rejected',()=>withRoot(async root=>assert.equal((await reserveReplayId({verificationId:'../../etc/passwd',registryRoot:root})).reason,'INVALID_VERIFICATION_ID')));
 test('group-accessible registry is rejected',()=>withRoot(async root=>{await chmod(root,0o750);assert.equal((await reserveReplayId({verificationId:id,registryRoot:root})).reason,'REGISTRY_PERMISSIONS_INVALID')}));
+
+test('registry root symlink fails closed',()=>withRoot(async root=>{
+ const link=root+'-link';
+ await symlink(root,link);
+ try{assert.equal((await reserveReplayId({verificationId:id,registryRoot:link})).reason,'REGISTRY_PERMISSIONS_INVALID')}
+ finally{await rm(link,{force:true})}
+}));
+test('reservation stores the exact ID and a newline',()=>withRoot(async root=>{
+ assert.equal((await reserveReplayId({verificationId:id,registryRoot:root})).status,'RESERVED_LOCAL_ONLY');
+ const files=await readdir(root);
+ assert.equal(await readFile(join(root,files[0]),'utf8'),id+'\n');
+}));
