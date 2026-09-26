@@ -41,3 +41,17 @@ test('noncanonical Base64 alias of a valid signature is rejected',()=>{
  assert.deepEqual(Buffer.from(alias,'base64'),Buffer.from(signatureBase64,'base64'));
  assert.equal(verifyOwnerPin({...args,signatureBase64:alias}).reason,'SIGNATURE_FORMAT_INVALID');
 });
+
+test('sparse arrays fail closed instead of silently dropping holes',()=>{
+ assert.throws(()=>canonical(Array(1)),/SPARSE_ARRAY/);
+ assert.throws(()=>canonical([1,,3]),/SPARSE_ARRAY/);
+});
+test('canonical nested JSON has deterministic key order',()=>{
+ assert.equal(canonical({z:[true,null,{b:2,a:'x'}],a:false}),'{"a":false,"z":[true,null,{"a":"x","b":2}]}');
+});
+test('canonical number formatting covers supported RFC 8785 values',()=>{
+ assert.equal(canonical([4.5,0.002,1e-7,-0]),'[4.5,0.002,1e-7,0]');
+});
+test('array undefined elements cannot be silently dropped',()=>{
+ assert.throws(()=>canonical([undefined]),/NON_JSON_OR_CYCLE/);
+});
