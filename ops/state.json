@@ -53,17 +53,20 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "LOCAL_HARDENING_50_OF_50_X2_PENDING_INDEPENDENT_PROVE",
-          "note": "Scoped zero-spend local-only hardening staged after founder continuation; two local 50/50 runs. No trusted operational activation, production workload, CI or paid resource. Independent exact-source PROVE rerun and GUARD review pending.",
+          "status": "LOCAL_SYNTHETIC_TECHNICAL_PROVE_PASS_OPERATIONAL_NOT_APPROVED",
+          "note": "Exact-source technical PROVE recheck on separate branch bc44f249...: seven Git blobs matched; fresh offline suite 50/50, plus live localhost-only 200/503/reset/timeout injection PASS. Operational reuse remains blocked by independent owner pin, hardened ancestor/immutable staging, OS resource limits and workload-specific budgets. No CI/production/spend.",
           "local_tests": {
             "tests": 50,
             "passed": 50,
             "failed": 0,
-            "repetitions": 2,
+            "build_repetitions": 2,
+            "prove_repetitions": 1,
             "runtime": "node-v22.16.0",
             "harness_blob": "5ae20aad76243799ff76f6893f22aa792a6be713",
             "test_blob": "45c97258eaabd90dff63365898aad4439e452707",
-            "trust_level": "SYNTHETIC_BUILD_ONLY_PENDING_PROVE"
+            "prove_review_commit": "bc44f2494fd7e88256e524e043ac1252995a1a19",
+            "prove_log_sha256": "87ecbe7768f31a2f8765c1c787f37e78a65e69bb10ba737a9c13a6bc4a1bf95b",
+            "trust_level": "OFFLINE_SYNTHETIC_TECHNICAL_ONLY"
           }
         },
         {
