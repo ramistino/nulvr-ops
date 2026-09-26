@@ -1,17 +1,29 @@
 // C4 read-only cgroup v2 readiness. Does not create cgroups or grant authority.
-import {readFileSync, statSync} from 'node:fs';
-import {resolve} from 'node:path';
+import {readFileSync, statSync, lstatSync} from 'node:fs';
+import {resolve, isAbsolute, relative, sep} from 'node:path';
 const ROOT='/sys/fs/cgroup';
 const read=(p)=>{try{return readFileSync(p,'utf8').trim()}catch{return null}};
 export function assessCgroup({root=ROOT,procCgroup='/proc/self/cgroup'}={}) {
   if(process.platform!=='linux')return {status:'BLOCKED',reason:'NOT_LINUX',operationalPass:false};
   const membership=read(procCgroup);
-  const match=membership?.split('\n').find(x=>x.startsWith('0::'));
-  if(!match)return {status:'BLOCKED',reason:'NO_CGROUP_V2_MEMBERSHIP',operationalPass:false};
-  const path=match.slice(3);
-  if(!path.startsWith('/')||path.includes('..'))return {status:'BLOCKED',reason:'INVALID_MEMBERSHIP',operationalPass:false};
-  const dir=resolve(root,'.'+path);
-  if(dir!==root&&!dir.startsWith(root+'/'))return {status:'BLOCKED',reason:'PATH_ESCAPE',operationalPass:false};
+  if(!isAbsolute(root))return {status:'BLOCKED',reason:'INVALID_ROOT',operationalPass:false};
+  const matches=membership?.split('\n').filter(x=>x.startsWith('0::'))||[];
+  if(matches.length!==1)return {status:'BLOCKED',reason:'AMBIGUOUS_CGROUP_V2_MEMBERSHIP',operationalPass:false};
+  const path=matches[0].slice(3);
+  if(!path.startsWith('/')||path.includes('..')||/[\x00-\x1f\x7f]/.test(path))return {status:'BLOCKED',reason:'INVALID_MEMBERSHIP',operationalPass:false};
+  const base=resolve(root);
+  const dir=resolve(base,'.'+path);
+  const rel=relative(base,dir);
+  if(rel==='..'||rel.startsWith('..'+sep)||isAbsolute(rel))return {status:'BLOCKED',reason:'PATH_ESCAPE',operationalPass:false};
+  // Do not follow symlinks in the caller-provided root or membership path.
+  try {
+    if(lstatSync(base).isSymbolicLink())throw Error('SYMLINK');
+    let current=base;
+    for(const part of rel.split(sep).filter(Boolean)){
+      current=resolve(current,part);
+      if(lstatSync(current).isSymbolicLink())throw Error('SYMLINK');
+    }
+  }catch{return {status:'BLOCKED',reason:'UNTRUSTED_CGROUP_PATH',operationalPass:false};}
   const controllers=(read(dir+'/cgroup.controllers')||'').split(/\s+/).filter(Boolean);
   const subtree=(read(dir+'/cgroup.subtree_control')||'').split(/\s+/).filter(Boolean);
   const events=read(dir+'/memory.events');
