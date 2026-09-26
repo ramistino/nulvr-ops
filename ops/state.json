@@ -77,8 +77,8 @@
           "title": "Reusable isolated load-test harness",
           "tier": "T2",
           "lane": "BUILD",
-          "status": "LOCAL_SYNTHETIC_TECHNICAL_PROVE_PASS_OPERATIONAL_NOT_APPROVED",
-          "note": "Exact-source technical PROVE recheck on separate branch bc44f249...: seven Git blobs matched; fresh offline suite 50/50, plus live localhost-only 200/503/reset/timeout injection PASS. Operational reuse remains blocked by independent owner pin, hardened ancestor/immutable staging, OS resource limits and workload-specific budgets. No CI/production/spend.",
+          "status": "LOCAL_WORK_OUTCOME_PATCH_STAGED_AWAITING_FULL_EXACT_SOURCE_TEST",
+          "note": "Founder authorized C4 local-only implementation. Branch now includes /work 503, reset, timeout and invalid-body injection plus independent work/liveness classification and five new tests. Exact-source full suite has not yet been rerun against this new branch; prior 50/50 result applies only to earlier revision. Operational use remains blocked by protected owner pin, immutable staging, OS limits and workload budgets. No CI, merge, deploy or spend.",
           "local_tests": {
             "tests": 50,
             "passed": 50,
@@ -91,6 +91,16 @@
             "prove_review_commit": "bc44f2494fd7e88256e524e043ac1252995a1a19",
             "prove_log_sha256": "87ecbe7768f31a2f8765c1c787f37e78a65e69bb10ba737a9c13a6bc4a1bf95b",
             "trust_level": "OFFLINE_SYNTHETIC_TECHNICAL_ONLY"
+          },
+          "pending_verification": {
+            "head_at_patch": "320b3ad636d6bf69ee29f476d5d1074f19670c32",
+            "tests_added": 5,
+            "source_paths": [
+              "ops/load-tests/local-harness.mjs",
+              "ops/load-tests/local-target.mjs",
+              "ops/tests/local-harness.test.mjs"
+            ],
+            "status": "UNVERIFIED_NEW_REVISION"
           }
         },
         {
